@@ -164,12 +164,13 @@
       background: #e3eee7;
       padding: 5px;
       border-radius: 60px;
+      flex-wrap: wrap;
     }
 
     .nav-tab {
       border: none;
       background: transparent;
-      padding: 8px 22px;
+      padding: 8px 18px;
       border-radius: 40px;
       font-weight: 600;
       color: #235b3d;
@@ -188,6 +189,27 @@
       background: rgba(255,255,255,0.3);
     }
 
+    .btn-back-menu {
+      background: rgba(255,255,255,0.7);
+      border: 1px solid #b8d5c4;
+      color: #15482e;
+      padding: 6px 14px;
+      border-radius: 40px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: 600;
+    }
+
+    .btn-back-menu:hover {
+      background: white;
+      border-color: #1a754b;
+      transform: scale(1.02);
+    }
+
     /* ===== PANTALLAS (secciones) ===== */
     .screen {
       display: none;
@@ -201,6 +223,20 @@
     @keyframes fadeUp {
       0% { opacity: 0; transform: translateY(12px); }
       100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .screen-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .screen-header h3 {
+      color: #1f543a;
+      font-size: 1.3rem;
     }
 
     /* ===== REGISTRO (pantalla 1) ===== */
@@ -271,10 +307,14 @@
 
     .btn-primary { background: #1a754b; color: white; }
     .btn-primary:hover { background: #0f5f3a; }
+    .btn-danger { background: #c0392b; color: white; }
+    .btn-danger:hover { background: #a93226; }
     .btn-outline { background: transparent; border: 1.5px solid #1a754b; color: #1a754b; }
     .btn-outline:hover { background: #e8f5ee; }
     .btn-export { background: #1f4e7a; color: white; }
     .btn-export:hover { background: #153b5c; }
+    .btn-warning { background: #f39c12; color: white; }
+    .btn-warning:hover { background: #d68910; }
 
     .table-wrap {
       background: white;
@@ -295,6 +335,7 @@
       color: #15482e;
       padding: 12px 8px;
       text-align: left;
+      white-space: nowrap;
     }
 
     .table-wrap td {
@@ -307,6 +348,35 @@
     .btn-icon { border: none; background: transparent; padding: 4px 10px; border-radius: 40px; cursor: pointer; font-weight:600; font-size:0.7rem; }
     .btn-edit { background: #fff1d6; color: #b7811a; }
     .btn-delete { background: #fde6e3; color: #b3413a; }
+    .btn-salida { background: #d6eaf8; color: #1a5276; }
+
+    /* ===== SALIDAS (pantalla 4) ===== */
+    .salidas-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 1.8rem;
+    }
+
+    @media (max-width: 900px) {
+      .salidas-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .select-material {
+      padding: 12px 14px;
+      border: 1px solid #d5e2db;
+      border-radius: 16px;
+      font-size: 0.9rem;
+      background: #fafdfb;
+      width: 100%;
+    }
+
+    .select-material:focus {
+      border-color: #1a754b;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(30,125,80,0.12);
+    }
 
     /* ===== DASHBOARD (pantalla 2) ===== */
     .dash-grid {
@@ -401,6 +471,8 @@
     .flex { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .text-muted { color: #3a6b51; }
     .w-full { width: 100%; }
+    .mb-2 { margin-bottom: 1rem; }
+    .gap-2 { gap: 12px; }
   </style>
 </head>
 <body>
@@ -408,8 +480,7 @@
 <!-- ========== SPLASH (LOGO GRANDE) ========== -->
 <div id="splashScreen">
   <div class="splash-logo">
-    <!-- Logo SVG (simula logo.jpeg) -->
-    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' fill='%231a754b' rx='30'/%3E%3Cpath d='M35 85 L55 35 L75 70 L95 45 L105 80 L35 85Z' fill='%23f9e79f'/%3E%3Ccircle cx='58' cy='48' r='12' fill='%23fdfefe'/%3E%3Ccircle cx='82' cy='62' r='9' fill='%23fdfefe'/%3E%3C/svg%3E" alt="Logo ISC">
+    <img src="logo.jpeg" alt="Logo ISC">
   </div>
   <div class="splash-title">Industria San Carlos</div>
   <div class="splash-sub">Ecosistema · Tecnología Ecológica</div>
@@ -418,6 +489,7 @@
     <button class="splash-btn splash-btn-primary" onclick="navegarA('registro')">📋 Registro</button>
     <button class="splash-btn" onclick="navegarA('dashboard')">📊 Dashboard</button>
     <button class="splash-btn" onclick="navegarA('proveedores')">🏭 Proveedores</button>
+    <button class="splash-btn" onclick="navegarA('salidas')">📤 Salidas</button>
   </div>
   <div style="margin-top: 2.5rem; color: #b0d5c0; font-size:0.8rem;">Selecciona una sección para comenzar</div>
 </div>
@@ -428,18 +500,23 @@
   <!-- header interno con navegación -->
   <div class="app-header">
     <div class="app-header-left">
-      <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' fill='%231a754b' rx='30'/%3E%3Cpath d='M35 85 L55 35 L75 70 L95 45 L105 80 L35 85Z' fill='%23f9e79f'/%3E%3Ccircle cx='58' cy='48' r='12' fill='%23fdfefe'/%3E%3Ccircle cx='82' cy='62' r='9' fill='%23fdfefe'/%3E%3C/svg%3E" alt="logo">
+      <img src="logo.jpeg" alt="logo">
       <h2>Industria San Carlos</h2>
     </div>
     <div class="nav-tabs">
       <button class="nav-tab active" data-screen="registro" onclick="cambiarScreen('registro')">📋 Registro</button>
       <button class="nav-tab" data-screen="dashboard" onclick="cambiarScreen('dashboard')">📊 Dashboard</button>
       <button class="nav-tab" data-screen="proveedores" onclick="cambiarScreen('proveedores')">🏭 Proveedores</button>
+      <button class="nav-tab" data-screen="salidas" onclick="cambiarScreen('salidas')">📤 Salidas</button>
     </div>
   </div>
 
   <!-- ========== PANTALLA 1: REGISTRO ========== -->
   <div id="screen-registro" class="screen active">
+    <div class="screen-header">
+      <h3>✏️ Registro de Inventario</h3>
+      <button class="btn-back-menu" onclick="volverAlMenu()">🏠 Volver al menú</button>
+    </div>
     <div class="register-grid">
       <div class="form-card">
         <h3>✏️ Agregar / Editar material</h3>
@@ -480,6 +557,10 @@
 
   <!-- ========== PANTALLA 2: DASHBOARD ========== -->
   <div id="screen-dashboard" class="screen">
+    <div class="screen-header">
+      <h3>📊 Panel de Control</h3>
+      <button class="btn-back-menu" onclick="volverAlMenu()">🏠 Volver al menú</button>
+    </div>
     <div class="dash-grid">
       <div class="kpi-card"><h4>Total productos</h4><div class="value" id="dashTotal">0</div><div class="sub">activos</div></div>
       <div class="kpi-card"><h4>Unidades totales</h4><div class="value" id="dashUnidades">0</div><div class="sub">en stock</div></div>
@@ -499,6 +580,10 @@
 
   <!-- ========== PANTALLA 3: PROVEEDORES ========== -->
   <div id="screen-proveedores" class="screen">
+    <div class="screen-header">
+      <h3>🏭 Proveedores</h3>
+      <button class="btn-back-menu" onclick="volverAlMenu()">🏠 Volver al menú</button>
+    </div>
     <div class="proveedores-grid">
       <div class="prov-card">
         <div class="flex"><h4>🏭 Proveedores principales</h4><span class="prov-badge">activos</span></div>
@@ -521,6 +606,53 @@
     </div>
   </div>
 
+  <!-- ========== PANTALLA 4: SALIDAS ========== -->
+  <div id="screen-salidas" class="screen">
+    <div class="screen-header">
+      <h3>📤 Registro de Salidas</h3>
+      <button class="btn-back-menu" onclick="volverAlMenu()">🏠 Volver al menú</button>
+    </div>
+    <div class="salidas-grid">
+      <div class="form-card">
+        <h3>📤 Registrar salida de material</h3>
+        <div style="margin-bottom: 12px;">
+          <label style="font-weight:600; color:#1f543a; font-size:0.85rem;">Seleccionar material</label>
+          <select id="selectMaterialSalida" class="select-material" onchange="actualizarStockDisponible()">
+            <option value="">-- Seleccionar --</option>
+          </select>
+        </div>
+        <div style="margin-bottom: 12px; background:#f3f9f5; padding:10px; border-radius:12px;">
+          <span style="font-size:0.85rem;">📦 Stock disponible: <strong id="stockDisponible">0</strong></span>
+        </div>
+        <div class="form-2col">
+          <input type="number" id="cantidadSalida" placeholder="Cantidad a retirar" min="1">
+          <input type="text" id="motivoSalida" placeholder="Motivo (ej: Venta, Uso interno)">
+        </div>
+        <div style="margin-top: 10px;">
+          <input type="text" id="destinoSalida" placeholder="Destino (ej: Obra, Cliente)" style="width:100%; padding:12px 14px; border:1px solid #d5e2db; border-radius:16px; font-size:0.9rem; background:#fafdfb;">
+        </div>
+        <div class="acciones-row">
+          <button class="btn btn-danger" onclick="registrarSalida()">📤 Registrar Salida</button>
+          <button class="btn btn-outline" onclick="limpiarSalida()">Limpiar</button>
+        </div>
+        <div style="margin-top: 12px; font-size:0.8rem; color:#2e6043;" id="salidaIndicator"></div>
+      </div>
+
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap;">
+          <span style="font-weight:600; color:#15482e;">📋 Historial de Salidas</span>
+          <span style="font-size:0.75rem; color:#3d6e52;" id="salidasCount"></span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Material</th><th>Cantidad</th><th>Motivo</th><th>Destino</th><th>Fecha</th><th>Acciones</th></tr></thead>
+            <tbody id="tablaSalidas"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -528,6 +660,7 @@
 //  DATOS Y ESTADO GLOBAL
 // ============================
 let inventario = JSON.parse(localStorage.getItem("inventarioISC")) || [];
+let salidas = JSON.parse(localStorage.getItem("salidasISC")) || [];
 let editando = null;
 let chartCategoria = null;
 let chartValorCategoria = null;
@@ -546,11 +679,15 @@ function navegarA(screen) {
   document.getElementById('splashScreen').classList.add('hidden');
   document.getElementById('appContent').style.display = 'block';
   cambiarScreen(screen);
-  // cargar datos
-  mostrarProductos();
-  actualizarDashboards();
-  actualizarGraficos();
-  renderProveedores();
+  cargarDatos();
+}
+
+function volverAlMenu() {
+  document.getElementById('splashScreen').classList.remove('hidden');
+  document.getElementById('appContent').style.display = 'none';
+  // Resetear tabs
+  document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
 }
 
 function cambiarScreen(screen) {
@@ -558,13 +695,16 @@ function cambiarScreen(screen) {
   document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
   document.getElementById('screen-' + screen).classList.add('active');
   document.querySelector(`.nav-tab[data-screen="${screen}"]`)?.classList.add('active');
-  if (screen === 'dashboard') {
-    actualizarDashboards();
-    actualizarGraficos();
-  }
-  if (screen === 'proveedores') {
-    renderProveedores();
-  }
+  cargarDatos();
+}
+
+function cargarDatos() {
+  mostrarProductos();
+  actualizarDashboards();
+  actualizarGraficos();
+  renderProveedores();
+  actualizarSelectSalidas();
+  mostrarSalidas();
 }
 
 // ============================
@@ -590,9 +730,7 @@ function guardarProducto() {
   }
   localStorage.setItem("inventarioISC", JSON.stringify(inventario));
   limpiarFormulario();
-  mostrarProductos();
-  actualizarDashboards();
-  actualizarGraficos();
+  cargarDatos();
 }
 
 function mostrarProductos() {
@@ -620,9 +758,6 @@ function mostrarProductos() {
     </tr>`;
   });
   document.getElementById("registroCount").textContent = `Mostrando ${tbody.children.length} de ${inventario.length}`;
-  // actualizar KPIs de registro (opcional)
-  document.getElementById("totalProductos") && (document.getElementById("totalProductos").textContent = inventario.length);
-  // pero usamos dashboards para la pantalla dashboard
 }
 
 function editarProducto(index) {
@@ -637,13 +772,11 @@ function editarProducto(index) {
 }
 
 function eliminarProducto(index) {
-  if (confirm("¿Eliminar?")) {
+  if (confirm("¿Eliminar este producto del inventario?")) {
     inventario.splice(index, 1);
     localStorage.setItem("inventarioISC", JSON.stringify(inventario));
     if (editando === index) { editando = null; document.getElementById("editIndicator").innerHTML = ''; }
-    mostrarProductos();
-    actualizarDashboards();
-    actualizarGraficos();
+    cargarDatos();
   }
 }
 
@@ -668,6 +801,120 @@ function exportarCSV() {
 }
 
 // ============================
+//  SALIDAS DE INVENTARIO
+// ============================
+function actualizarSelectSalidas() {
+  const select = document.getElementById("selectMaterialSalida");
+  select.innerHTML = '<option value="">-- Seleccionar --</option>';
+  inventario.forEach((p, idx) => {
+    if (p.cantidad > 0) {
+      select.innerHTML += `<option value="${idx}">${p.nombre} (${p.codigo}) - Stock: ${p.cantidad}</option>`;
+    }
+  });
+}
+
+function actualizarStockDisponible() {
+  const idx = document.getElementById("selectMaterialSalida").value;
+  if (idx !== "") {
+    const producto = inventario[parseInt(idx)];
+    document.getElementById("stockDisponible").textContent = producto.cantidad;
+    document.getElementById("cantidadSalida").max = producto.cantidad;
+  } else {
+    document.getElementById("stockDisponible").textContent = "0";
+  }
+}
+
+function registrarSalida() {
+  const idx = document.getElementById("selectMaterialSalida").value;
+  const cantidad = Number(document.getElementById("cantidadSalida").value);
+  const motivo = document.getElementById("motivoSalida").value.trim();
+  const destino = document.getElementById("destinoSalida").value.trim();
+
+  if (idx === "") {
+    alert("Selecciona un material");
+    return;
+  }
+  if (!cantidad || cantidad <= 0) {
+    alert("Ingresa una cantidad válida");
+    return;
+  }
+  if (!motivo) {
+    alert("Ingresa un motivo para la salida");
+    return;
+  }
+
+  const producto = inventario[parseInt(idx)];
+  if (cantidad > producto.cantidad) {
+    alert(`Stock insuficiente. Solo hay ${producto.cantidad} unidades disponibles.`);
+    return;
+  }
+
+  // Registrar salida
+  const salida = {
+    material: producto.nombre,
+    codigo: producto.codigo,
+    cantidad: cantidad,
+    motivo: motivo,
+    destino: destino || "No especificado",
+    fecha: new Date().toLocaleString(),
+    timestamp: Date.now()
+  };
+  salidas.push(salida);
+  localStorage.setItem("salidasISC", JSON.stringify(salidas));
+
+  // Actualizar inventario
+  producto.cantidad -= cantidad;
+  localStorage.setItem("inventarioISC", JSON.stringify(inventario));
+
+  // Limpiar y actualizar
+  limpiarSalida();
+  cargarDatos();
+  document.getElementById("salidaIndicator").innerHTML = `✅ Salida registrada: ${cantidad} unidades de ${producto.nombre}`;
+  setTimeout(() => {
+    document.getElementById("salidaIndicator").innerHTML = '';
+  }, 3000);
+}
+
+function mostrarSalidas() {
+  const tbody = document.getElementById("tablaSalidas");
+  tbody.innerHTML = "";
+  // Mostrar más recientes primero
+  const salidasOrdenadas = [...salidas].reverse();
+  salidasOrdenadas.forEach((s, idx) => {
+    const idxReal = salidas.length - 1 - idx;
+    tbody.innerHTML += `
+    <tr>
+      <td><strong>${s.material}</strong><br><span style="font-size:0.7rem; color:#3d6e52;">${s.codigo}</span></td>
+      <td><span style="font-weight:600; color:#c0392b;">-${s.cantidad}</span></td>
+      <td>${s.motivo}</td>
+      <td>${s.destino}</td>
+      <td style="font-size:0.75rem;">${s.fecha}</td>
+      <td>
+        <button class="btn-icon btn-delete" onclick="eliminarSalida(${idxReal})">✕</button>
+      </td>
+    </tr>`;
+  });
+  document.getElementById("salidasCount").textContent = `Total: ${salidas.length} salidas`;
+}
+
+function eliminarSalida(index) {
+  if (confirm("¿Eliminar esta salida? Esto no revertirá el stock automáticamente.")) {
+    salidas.splice(index, 1);
+    localStorage.setItem("salidasISC", JSON.stringify(salidas));
+    mostrarSalidas();
+  }
+}
+
+function limpiarSalida() {
+  document.getElementById("selectMaterialSalida").value = "";
+  document.getElementById("cantidadSalida").value = "";
+  document.getElementById("motivoSalida").value = "";
+  document.getElementById("destinoSalida").value = "";
+  document.getElementById("stockDisponible").textContent = "0";
+  document.getElementById("salidaIndicator").innerHTML = '';
+}
+
+// ============================
 //  DASHBOARD (KPIs + gráficos)
 // ============================
 function actualizarDashboards() {
@@ -682,7 +929,7 @@ function actualizarDashboards() {
   document.getElementById("dashUnidades").textContent = unidades;
   document.getElementById("dashValor").textContent = "$" + valor.toFixed(2);
   document.getElementById("dashBajo").textContent = bajo;
-  document.getElementById("dashResumen").textContent = `📌 ${total} productos · ${unidades} unidades · valor total $${valor.toFixed(2)} · ${bajo} alertas de stock bajo.`;
+  document.getElementById("dashResumen").textContent = `📌 ${total} productos · ${unidades} unidades · valor total $${valor.toFixed(2)} · ${bajo} alertas de stock bajo. Salidas registradas: ${salidas.length}`;
 }
 
 function actualizarGraficos() {
@@ -753,16 +1000,10 @@ function agregarProveedor() {
 }
 
 // ============================
-//  INIT (carga inicial)
+//  INIT
 // ============================
-// Mostrar splash, el contenido se muestra al hacer clic.
-// Pero si ya hay datos, los mostramos cuando se navegue.
 document.addEventListener('DOMContentLoaded', () => {
-  // precargar datos
-  mostrarProductos();
-  actualizarDashboards();
-  actualizarGraficos();
-  renderProveedores();
+  cargarDatos();
 });
 </script>
 
