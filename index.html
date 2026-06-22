@@ -1,491 +1,769 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Industria San Carlos - Inventario</title>
-
-<style>
-:root{
-    --verde-principal:#1e7d4f;
-    --verde-secundario:#2fa36a;
-    --verde-claro:#dff4e8;
-    --gris:#f4f6f8;
-    --oscuro:#1f2937;
-    --blanco:#ffffff;
-    --rojo:#dc2626;
-    --amarillo:#f59e0b;
-}
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Segoe UI,Arial,sans-serif;
-}
-
-body{
-    background:var(--gris);
-    color:var(--oscuro);
-}
-
-header{
-    background:linear-gradient(135deg,var(--verde-principal),var(--verde-secundario));
-    color:white;
-    padding:15px;
-    display:flex;
-    align-items:center;
-    gap:15px;
-    box-shadow:0 2px 10px rgba(0,0,0,.15);
-}
-
-header img{
-    width:60px;
-    height:60px;
-    object-fit:contain;
-    background:white;
-    border-radius:10px;
-    padding:5px;
-}
-
-header h1{
-    font-size:1.5rem;
-}
-
-header p{
-    font-size:.9rem;
-    opacity:.9;
-}
-
-.container{
-    padding:20px;
-    max-width:1400px;
-    margin:auto;
-}
-
-.dashboard{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-    gap:15px;
-    margin-bottom:20px;
-}
-
-.card{
-    background:white;
-    border-radius:12px;
-    padding:20px;
-    box-shadow:0 2px 8px rgba(0,0,0,.08);
-}
-
-.card h3{
-    color:var(--verde-principal);
-    margin-bottom:10px;
-}
-
-.card .valor{
-    font-size:2rem;
-    font-weight:bold;
-}
-
-.formulario{
-    background:white;
-    padding:20px;
-    border-radius:12px;
-    box-shadow:0 2px 8px rgba(0,0,0,.08);
-    margin-bottom:20px;
-}
-
-.form-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-    gap:10px;
-}
-
-input,select{
-    width:100%;
-    padding:12px;
-    border:1px solid #ccc;
-    border-radius:8px;
-}
-
-button{
-    border:none;
-    cursor:pointer;
-    padding:12px 16px;
-    border-radius:8px;
-    font-weight:bold;
-}
-
-.btn-agregar{
-    background:var(--verde-principal);
-    color:white;
-}
-
-.btn-exportar{
-    background:#2563eb;
-    color:white;
-}
-
-.btn-editar{
-    background:var(--amarillo);
-    color:white;
-}
-
-.btn-eliminar{
-    background:var(--rojo);
-    color:white;
-}
-
-.acciones{
-    display:flex;
-    gap:8px;
-    flex-wrap:wrap;
-    margin-top:15px;
-}
-
-.buscador{
-    margin-bottom:15px;
-}
-
-.buscador input{
-    background:white;
-}
-
-.tabla-container{
-    overflow-x:auto;
-    background:white;
-    border-radius:12px;
-    box-shadow:0 2px 8px rgba(0,0,0,.08);
-}
-
-table{
-    width:100%;
-    border-collapse:collapse;
-}
-
-th{
-    background:var(--verde-principal);
-    color:white;
-}
-
-th,td{
-    padding:12px;
-    text-align:left;
-    border-bottom:1px solid #ddd;
-}
-
-.stock-bajo{
-    color:var(--rojo);
-    font-weight:bold;
-}
-
-.stock-normal{
-    color:var(--verde-principal);
-    font-weight:bold;
-}
-
-@media(max-width:768px){
-    header{
-        flex-direction:column;
-        text-align:center;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ISC · Industria San Carlos</title>
+  <!-- Chart.js para gráficos -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
     }
 
-    .acciones{
-        flex-direction:column;
+    body {
+      background: #eef3f0;
+      color: #0b2a1e;
+      min-height: 100vh;
     }
 
-    button{
-        width:100%;
+    /* ========== PANTALLA DE INICIO (LOGO GRANDE) ========== */
+    #splashScreen {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(145deg, #0f3b28, #1b6e4a);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.6s ease, visibility 0.6s ease;
+      padding: 2rem;
+      text-align: center;
     }
-}
-</style>
+
+    #splashScreen.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .splash-logo {
+      background: white;
+      border-radius: 60px;
+      padding: 24px 30px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+      margin-bottom: 2rem;
+      border: 4px solid #d4edda;
+      transition: transform 0.3s ease;
+    }
+
+    .splash-logo img {
+      width: 180px;
+      height: 180px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .splash-title {
+      color: white;
+      font-size: 2.8rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .splash-sub {
+      color: #c6e6d3;
+      font-size: 1.1rem;
+      margin: 0.5rem 0 2rem 0;
+      font-weight: 300;
+      letter-spacing: 2px;
+    }
+
+    .splash-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 18px;
+    }
+
+    .splash-btn {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(6px);
+      border: 1.5px solid rgba(255, 255, 255, 0.25);
+      color: white;
+      padding: 14px 38px;
+      border-radius: 60px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .splash-btn:hover {
+      background: white;
+      color: #0f3b28;
+      transform: scale(1.03);
+      border-color: white;
+    }
+
+    .splash-btn-primary {
+      background: #ffd966;
+      color: #1f4d2f;
+      border-color: #ffd966;
+    }
+
+    .splash-btn-primary:hover {
+      background: #ffe28a;
+      border-color: #ffe28a;
+      color: #0f3b28;
+    }
+
+    /* ========== APP (contenido principal) ========== */
+    #appContent {
+      display: block;
+      max-width: 1500px;
+      margin: 0 auto;
+      padding: 1.2rem 1.8rem 2rem 1.8rem;
+    }
+
+    /* header interno */
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 1.8rem;
+      padding-bottom: 0.6rem;
+      border-bottom: 2px solid #d4e4db;
+    }
+
+    .app-header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .app-header-left img {
+      width: 52px;
+      height: 52px;
+      object-fit: contain;
+      background: white;
+      border-radius: 30px;
+      padding: 6px;
+      border: 1px solid #b8d5c4;
+    }
+
+    .app-header-left h2 {
+      color: #15482e;
+      font-weight: 600;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 6px;
+      background: #e3eee7;
+      padding: 5px;
+      border-radius: 60px;
+    }
+
+    .nav-tab {
+      border: none;
+      background: transparent;
+      padding: 8px 22px;
+      border-radius: 40px;
+      font-weight: 600;
+      color: #235b3d;
+      cursor: pointer;
+      transition: 0.15s;
+      font-size: 0.85rem;
+    }
+
+    .nav-tab.active {
+      background: white;
+      box-shadow: 0 2px 8px rgba(0, 30, 10, 0.08);
+      color: #0f3b28;
+    }
+
+    .nav-tab:hover:not(.active) {
+      background: rgba(255,255,255,0.3);
+    }
+
+    /* ===== PANTALLAS (secciones) ===== */
+    .screen {
+      display: none;
+      animation: fadeUp 0.25s ease;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    @keyframes fadeUp {
+      0% { opacity: 0; transform: translateY(12px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== REGISTRO (pantalla 1) ===== */
+    .register-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 1.8rem;
+    }
+
+    @media (max-width: 900px) {
+      .register-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .form-card {
+      background: white;
+      border-radius: 28px;
+      padding: 1.8rem;
+      box-shadow: 0 6px 18px rgba(0,20,0,0.04);
+      border: 1px solid #eaf3ee;
+    }
+
+    .form-card h3 {
+      color: #1f543a;
+      margin-bottom: 1.2rem;
+    }
+
+    .form-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .form-2col input, .form-2col select {
+      padding: 12px 14px;
+      border: 1px solid #d5e2db;
+      border-radius: 16px;
+      font-size: 0.9rem;
+      background: #fafdfb;
+    }
+
+    .form-2col input:focus, .form-2col select:focus {
+      border-color: #1a754b;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(30,125,80,0.12);
+    }
+
+    .acciones-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 1.4rem;
+    }
+
+    .btn {
+      border: none;
+      padding: 10px 24px;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: 0.1s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-primary { background: #1a754b; color: white; }
+    .btn-primary:hover { background: #0f5f3a; }
+    .btn-outline { background: transparent; border: 1.5px solid #1a754b; color: #1a754b; }
+    .btn-outline:hover { background: #e8f5ee; }
+    .btn-export { background: #1f4e7a; color: white; }
+    .btn-export:hover { background: #153b5c; }
+
+    .table-wrap {
+      background: white;
+      border-radius: 24px;
+      padding: 0.2rem 0.2rem 0.2rem 0.2rem;
+      border: 1px solid #eaf3ee;
+      overflow-x: auto;
+    }
+
+    .table-wrap table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    .table-wrap th {
+      background: #eaf3ee;
+      color: #15482e;
+      padding: 12px 8px;
+      text-align: left;
+    }
+
+    .table-wrap td {
+      padding: 10px 8px;
+      border-bottom: 1px solid #e3eee7;
+    }
+
+    .estado-bajo { background: #fee9e7; color: #b33a34; padding: 2px 12px; border-radius: 40px; font-weight: 600; font-size:0.7rem; display:inline-block; }
+    .estado-normal { background: #e1f3e8; color: #146b3f; padding: 2px 12px; border-radius: 40px; font-weight: 600; font-size:0.7rem; display:inline-block; }
+    .btn-icon { border: none; background: transparent; padding: 4px 10px; border-radius: 40px; cursor: pointer; font-weight:600; font-size:0.7rem; }
+    .btn-edit { background: #fff1d6; color: #b7811a; }
+    .btn-delete { background: #fde6e3; color: #b3413a; }
+
+    /* ===== DASHBOARD (pantalla 2) ===== */
+    .dash-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1.2rem;
+      margin-bottom: 2rem;
+    }
+
+    .kpi-card {
+      background: white;
+      border-radius: 24px;
+      padding: 1.2rem;
+      box-shadow: 0 4px 14px rgba(0,20,0,0.04);
+      border: 1px solid #eaf3ee;
+    }
+
+    .kpi-card h4 { font-size: 0.7rem; text-transform: uppercase; color: #2b6b47; opacity: 0.7; }
+    .kpi-card .value { font-size: 2.2rem; font-weight: 700; color: #0d3422; }
+    .kpi-card .sub { font-size: 0.75rem; color: #3b6b50; }
+
+    .chart-double {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.8rem;
+      margin-bottom: 1.8rem;
+    }
+
+    @media (max-width: 800px) {
+      .chart-double { grid-template-columns: 1fr; }
+    }
+
+    .chart-box {
+      background: white;
+      border-radius: 28px;
+      padding: 1.2rem;
+      border: 1px solid #eaf3ee;
+    }
+
+    .chart-box h4 { color: #1f543a; margin-bottom: 0.6rem; }
+    .chart-container { height: 180px; width: 100%; position: relative; }
+
+    /* ===== PROVEEDORES (pantalla 3) ===== */
+    .proveedores-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.8rem;
+    }
+
+    @media (max-width: 800px) {
+      .proveedores-grid { grid-template-columns: 1fr; }
+    }
+
+    .prov-card {
+      background: white;
+      border-radius: 28px;
+      padding: 1.4rem 1.6rem;
+      border: 1px solid #eaf3ee;
+      box-shadow: 0 4px 14px rgba(0,20,0,0.03);
+    }
+
+    .prov-card h4 { color: #1f543a; margin-bottom: 0.4rem; }
+    .prov-badge { background: #e5f2ea; padding: 2px 14px; border-radius: 40px; font-size: 0.7rem; color: #146b3f; }
+
+    .list-item {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #e3eee7;
+      padding: 10px 0;
+    }
+
+    .list-item:last-child { border-bottom: none; }
+
+    .splash-btn-back {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: white;
+      padding: 8px 18px;
+      border-radius: 40px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: 0.1s;
+      margin-top: 24px;
+    }
+
+    .splash-btn-back:hover {
+      background: rgba(255,255,255,0.2);
+    }
+
+    /* util */
+    .mt-2 { margin-top: 1.2rem; }
+    .flex { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .text-muted { color: #3a6b51; }
+    .w-full { width: 100%; }
+  </style>
 </head>
-
 <body>
 
-<header>
-    <img src="logo.jpeg" alt="Logo"> 
-    <div>
-        <h1>Industria San Carlos</h1>
-        <p>Ecosistema Líder en Tecnología Ecológica</p>
+<!-- ========== SPLASH (LOGO GRANDE) ========== -->
+<div id="splashScreen">
+  <div class="splash-logo">
+    <!-- Logo SVG (simula logo.jpeg) -->
+    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' fill='%231a754b' rx='30'/%3E%3Cpath d='M35 85 L55 35 L75 70 L95 45 L105 80 L35 85Z' fill='%23f9e79f'/%3E%3Ccircle cx='58' cy='48' r='12' fill='%23fdfefe'/%3E%3Ccircle cx='82' cy='62' r='9' fill='%23fdfefe'/%3E%3C/svg%3E" alt="Logo ISC">
+  </div>
+  <div class="splash-title">Industria San Carlos</div>
+  <div class="splash-sub">Ecosistema · Tecnología Ecológica</div>
+
+  <div class="splash-buttons">
+    <button class="splash-btn splash-btn-primary" onclick="navegarA('registro')">📋 Registro</button>
+    <button class="splash-btn" onclick="navegarA('dashboard')">📊 Dashboard</button>
+    <button class="splash-btn" onclick="navegarA('proveedores')">🏭 Proveedores</button>
+  </div>
+  <div style="margin-top: 2.5rem; color: #b0d5c0; font-size:0.8rem;">Selecciona una sección para comenzar</div>
+</div>
+
+<!-- ========== APP PRINCIPAL ========== -->
+<div id="appContent" style="display:none;">
+
+  <!-- header interno con navegación -->
+  <div class="app-header">
+    <div class="app-header-left">
+      <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' fill='%231a754b' rx='30'/%3E%3Cpath d='M35 85 L55 35 L75 70 L95 45 L105 80 L35 85Z' fill='%23f9e79f'/%3E%3Ccircle cx='58' cy='48' r='12' fill='%23fdfefe'/%3E%3Ccircle cx='82' cy='62' r='9' fill='%23fdfefe'/%3E%3C/svg%3E" alt="logo">
+      <h2>Industria San Carlos</h2>
     </div>
-</header>
-
-<div class="container">
-
-    <div class="dashboard">
-        <div class="card">
-            <h3>Total Productos</h3>
-            <div class="valor" id="totalProductos">0</div>
-        </div>
-
-        <div class="card">
-            <h3>Unidades en Inventario</h3>
-            <div class="valor" id="totalUnidades">0</div>
-        </div>
-
-        <div class="card">
-            <h3>Valor Inventario</h3>
-            <div class="valor" id="valorInventario">$0</div>
-        </div>
-
-        <div class="card">
-            <h3>Stock Bajo</h3>
-            <div class="valor" id="stockBajo">0</div>
-        </div>
+    <div class="nav-tabs">
+      <button class="nav-tab active" data-screen="registro" onclick="cambiarScreen('registro')">📋 Registro</button>
+      <button class="nav-tab" data-screen="dashboard" onclick="cambiarScreen('dashboard')">📊 Dashboard</button>
+      <button class="nav-tab" data-screen="proveedores" onclick="cambiarScreen('proveedores')">🏭 Proveedores</button>
     </div>
+  </div>
 
-    <div class="formulario">
-        <h2>Agregar Material</h2>
-        <br>
-
-        <div class="form-grid">
-            <input type="text" id="nombre" placeholder="Nombre del material">
-
-            <input type="text" id="codigo" placeholder="Código">
-
-            <select id="categoria">
-                <option>Herramientas</option>
-                <option>Tornillería</option>
-                <option>Electricidad</option>
-                <option>PVC</option>
-                <option>Pintura</option>
-                <option>Construcción</option>
-            </select>
-
-            <input type="number" id="cantidad" placeholder="Cantidad">
-
-            <input type="number" id="precio" placeholder="Precio Unitario">
+  <!-- ========== PANTALLA 1: REGISTRO ========== -->
+  <div id="screen-registro" class="screen active">
+    <div class="register-grid">
+      <div class="form-card">
+        <h3>✏️ Agregar / Editar material</h3>
+        <div class="form-2col">
+          <input type="text" id="nombre" placeholder="Material">
+          <input type="text" id="codigo" placeholder="Código">
+          <select id="categoria">
+            <option>Herramientas</option><option>Tornillería</option>
+            <option>Electricidad</option><option>PVC</option>
+            <option>Pintura</option><option>Construcción</option>
+          </select>
+          <input type="number" id="cantidad" placeholder="Cantidad">
+          <input type="number" id="precio" placeholder="Precio unitario" step="0.01">
         </div>
-
-        <div class="acciones">
-            <button class="btn-agregar" onclick="guardarProducto()">
-                Guardar Producto
-            </button>
-
-            <button class="btn-exportar" onclick="exportarCSV()">
-                Exportar CSV
-            </button>
+        <div class="acciones-row">
+          <button class="btn btn-primary" onclick="guardarProducto()">💾 Guardar</button>
+          <button class="btn btn-outline" onclick="limpiarFormulario()">Limpiar</button>
+          <button class="btn btn-export" onclick="exportarCSV()">📤 Exportar CSV</button>
         </div>
-    </div>
+        <div style="margin-top: 12px; font-size:0.8rem; color:#2e6043;" id="editIndicator"></div>
+      </div>
 
-    <div class="buscador">
-        <input
-        type="text"
-        id="buscar"
-        placeholder="Buscar producto..."
-        onkeyup="mostrarProductos()">
-    </div>
-
-    <div class="tabla-container">
-        <table>
-            <thead>
-                <tr>
-                    <th>Código</th>
-                    <th>Material</th>
-                    <th>Categoría</th>
-                    <th>Cantidad</th>
-                    <th>Precio</th>
-                    <th>Total</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap;">
+          <span style="font-weight:600; color:#15482e;">📋 Inventario</span>
+          <input type="text" id="buscar" placeholder="🔍 Buscar..." onkeyup="mostrarProductos()" style="padding:8px 16px; border-radius:40px; border:1px solid #d0dfd6; background:#f8fbf9; width:180px;">
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Código</th><th>Material</th><th>Categoría</th><th>Cant</th><th>Precio</th><th>Total</th><th>Estado</th><th>Acciones</th></tr></thead>
             <tbody id="tablaInventario"></tbody>
-        </table>
+          </table>
+        </div>
+        <div style="padding:6px 0; font-size:0.7rem; color:#3d6e52; text-align:right;" id="registroCount"></div>
+      </div>
     </div>
+  </div>
+
+  <!-- ========== PANTALLA 2: DASHBOARD ========== -->
+  <div id="screen-dashboard" class="screen">
+    <div class="dash-grid">
+      <div class="kpi-card"><h4>Total productos</h4><div class="value" id="dashTotal">0</div><div class="sub">activos</div></div>
+      <div class="kpi-card"><h4>Unidades totales</h4><div class="value" id="dashUnidades">0</div><div class="sub">en stock</div></div>
+      <div class="kpi-card"><h4>Valor inventario</h4><div class="value" id="dashValor">$0</div><div class="sub">USD</div></div>
+      <div class="kpi-card"><h4>⚠️ Stock bajo</h4><div class="value" id="dashBajo">0</div><div class="sub">alertas</div></div>
+    </div>
+
+    <div class="chart-double">
+      <div class="chart-box"><h4>📊 Cantidad por categoría</h4><div class="chart-container"><canvas id="chartCategorias"></canvas></div></div>
+      <div class="chart-box"><h4>💰 Valor por categoría</h4><div class="chart-container"><canvas id="chartValorCategoria"></canvas></div></div>
+    </div>
+    <div style="background:white; border-radius:28px; padding:1.2rem; border:1px solid #eaf3ee;">
+      <h4 style="color:#1f543a;">📈 Resumen rápido</h4>
+      <p style="color:#2d5f44;" id="dashResumen">Carga de datos...</p>
+    </div>
+  </div>
+
+  <!-- ========== PANTALLA 3: PROVEEDORES ========== -->
+  <div id="screen-proveedores" class="screen">
+    <div class="proveedores-grid">
+      <div class="prov-card">
+        <div class="flex"><h4>🏭 Proveedores principales</h4><span class="prov-badge">activos</span></div>
+        <div id="listaProveedores"></div>
+        <div style="margin-top: 1rem; background:#f3f9f5; border-radius:20px; padding:0.8rem;">
+          <span style="font-weight:600; color:#1f543a;">➕ Agregar proveedor</span>
+          <div class="flex" style="margin-top:6px;">
+            <input type="text" id="nuevoProveedor" placeholder="Nombre" style="flex:1; padding:8px 14px; border-radius:40px; border:1px solid #d0dfd6;">
+            <button class="btn btn-primary" onclick="agregarProveedor()">Añadir</button>
+          </div>
+        </div>
+      </div>
+      <div class="prov-card">
+        <h4>📦 Últimas compras (simuladas)</h4>
+        <div id="ultimasCompras"></div>
+        <div style="margin-top: 0.8rem; background:#f3f9f5; border-radius:20px; padding:0.6rem 1rem;">
+          <span style="font-size:0.8rem; color:#2d5f44;">⚡ Total gastado en compras: <strong id="totalGastado">$0</strong></span>
+        </div>
+      </div>
+    </div>
+  </div>
 
 </div>
 
 <script>
-
-let inventario =
-JSON.parse(localStorage.getItem("inventarioISC")) || [];
-
+// ============================
+//  DATOS Y ESTADO GLOBAL
+// ============================
+let inventario = JSON.parse(localStorage.getItem("inventarioISC")) || [];
 let editando = null;
+let chartCategoria = null;
+let chartValorCategoria = null;
 
-function guardarProducto(){
+// Proveedores (simulados)
+let proveedores = [
+  { nombre: "Aceros del Norte", compras: 3, ultimo: "2025-05-12" },
+  { nombre: "ElectroCenter S.A.", compras: 5, ultimo: "2025-05-10" },
+  { nombre: "Distribuidora PVC", compras: 2, ultimo: "2025-05-08" },
+];
 
-    const producto = {
-        nombre: document.getElementById("nombre").value,
-        codigo: document.getElementById("codigo").value,
-        categoria: document.getElementById("categoria").value,
-        cantidad: Number(document.getElementById("cantidad").value),
-        precio: Number(document.getElementById("precio").value)
-    };
+// ============================
+//  SPLASH / NAVEGACIÓN
+// ============================
+function navegarA(screen) {
+  document.getElementById('splashScreen').classList.add('hidden');
+  document.getElementById('appContent').style.display = 'block';
+  cambiarScreen(screen);
+  // cargar datos
+  mostrarProductos();
+  actualizarDashboards();
+  actualizarGraficos();
+  renderProveedores();
+}
 
-    if(
-        !producto.nombre ||
-        !producto.codigo ||
-        producto.cantidad <= 0 ||
-        producto.precio <= 0
-    ){
-        alert("Complete todos los campos.");
-        return;
-    }
+function cambiarScreen(screen) {
+  document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+  document.getElementById('screen-' + screen).classList.add('active');
+  document.querySelector(`.nav-tab[data-screen="${screen}"]`)?.classList.add('active');
+  if (screen === 'dashboard') {
+    actualizarDashboards();
+    actualizarGraficos();
+  }
+  if (screen === 'proveedores') {
+    renderProveedores();
+  }
+}
 
-    if(editando !== null){
-        inventario[editando] = producto;
-        editando = null;
-    }else{
-        inventario.push(producto);
-    }
+// ============================
+//  CRUD INVENTARIO
+// ============================
+function guardarProducto() {
+  const nombre = document.getElementById("nombre").value.trim();
+  const codigo = document.getElementById("codigo").value.trim();
+  const categoria = document.getElementById("categoria").value;
+  const cantidad = Number(document.getElementById("cantidad").value);
+  const precio = Number(document.getElementById("precio").value);
+  if (!nombre || !codigo || cantidad <= 0 || precio <= 0) {
+    alert("Completa todos los campos (cantidad y precio > 0)");
+    return;
+  }
+  const producto = { nombre, codigo, categoria, cantidad, precio };
+  if (editando !== null) {
+    inventario[editando] = producto;
+    editando = null;
+    document.getElementById("editIndicator").innerHTML = '';
+  } else {
+    inventario.push(producto);
+  }
+  localStorage.setItem("inventarioISC", JSON.stringify(inventario));
+  limpiarFormulario();
+  mostrarProductos();
+  actualizarDashboards();
+  actualizarGraficos();
+}
 
-    localStorage.setItem(
-        "inventarioISC",
-        JSON.stringify(inventario)
-    );
+function mostrarProductos() {
+  const filtro = document.getElementById("buscar").value.toLowerCase();
+  const tbody = document.getElementById("tablaInventario");
+  tbody.innerHTML = "";
+  let totalUnidades = 0, valorInv = 0, stockBajo = 0;
+  inventario.forEach((p, idx) => {
+    const match = p.nombre.toLowerCase().includes(filtro) || p.codigo.toLowerCase().includes(filtro);
+    if (!match) return;
+    totalUnidades += p.cantidad;
+    valorInv += p.cantidad * p.precio;
+    if (p.cantidad < 10) stockBajo++;
+    const estado = p.cantidad < 10 ? '<span class="estado-bajo">Bajo</span>' : '<span class="estado-normal">Normal</span>';
+    tbody.innerHTML += `
+    <tr>
+      <td>${p.codigo}</td><td>${p.nombre}</td><td>${p.categoria}</td>
+      <td>${p.cantidad}</td><td>$${p.precio.toFixed(2)}</td>
+      <td>$${(p.cantidad*p.precio).toFixed(2)}</td>
+      <td>${estado}</td>
+      <td>
+        <button class="btn-icon btn-edit" onclick="editarProducto(${idx})">✎</button>
+        <button class="btn-icon btn-delete" onclick="eliminarProducto(${idx})">✕</button>
+      </td>
+    </tr>`;
+  });
+  document.getElementById("registroCount").textContent = `Mostrando ${tbody.children.length} de ${inventario.length}`;
+  // actualizar KPIs de registro (opcional)
+  document.getElementById("totalProductos") && (document.getElementById("totalProductos").textContent = inventario.length);
+  // pero usamos dashboards para la pantalla dashboard
+}
 
-    limpiarFormulario();
+function editarProducto(index) {
+  const p = inventario[index];
+  document.getElementById("nombre").value = p.nombre;
+  document.getElementById("codigo").value = p.codigo;
+  document.getElementById("categoria").value = p.categoria;
+  document.getElementById("cantidad").value = p.cantidad;
+  document.getElementById("precio").value = p.precio;
+  editando = index;
+  document.getElementById("editIndicator").innerHTML = `✏️ Editando: <strong>${p.nombre}</strong>`;
+}
+
+function eliminarProducto(index) {
+  if (confirm("¿Eliminar?")) {
+    inventario.splice(index, 1);
+    localStorage.setItem("inventarioISC", JSON.stringify(inventario));
+    if (editando === index) { editando = null; document.getElementById("editIndicator").innerHTML = ''; }
     mostrarProductos();
+    actualizarDashboards();
+    actualizarGraficos();
+  }
 }
 
-function mostrarProductos(){
-
-    let filtro =
-    document.getElementById("buscar")
-    .value
-    .toLowerCase();
-
-    let tabla =
-    document.getElementById("tablaInventario");
-
-    tabla.innerHTML = "";
-
-    let totalUnidades = 0;
-    let valorInventario = 0;
-    let stockBajo = 0;
-
-    inventario.forEach((p,index)=>{
-
-        if(
-            !p.nombre.toLowerCase().includes(filtro) &&
-            !p.codigo.toLowerCase().includes(filtro)
-        ){
-            return;
-        }
-
-        totalUnidades += p.cantidad;
-        valorInventario += p.cantidad * p.precio;
-
-        let estado = "";
-
-        if(p.cantidad < 10){
-            estado = '<span class="stock-bajo">Bajo</span>';
-            stockBajo++;
-        }else{
-            estado = '<span class="stock-normal">Normal</span>';
-        }
-
-        tabla.innerHTML += `
-        <tr>
-            <td>${p.codigo}</td>
-            <td>${p.nombre}</td>
-            <td>${p.categoria}</td>
-            <td>${p.cantidad}</td>
-            <td>$${p.precio.toFixed(2)}</td>
-            <td>$${(p.cantidad*p.precio).toFixed(2)}</td>
-            <td>${estado}</td>
-            <td>
-                <button class="btn-editar"
-                onclick="editarProducto(${index})">
-                Editar
-                </button>
-
-                <button class="btn-eliminar"
-                onclick="eliminarProducto(${index})">
-                Eliminar
-                </button>
-            </td>
-        </tr>
-        `;
-    });
-
-    document.getElementById("totalProductos").textContent =
-    inventario.length;
-
-    document.getElementById("totalUnidades").textContent =
-    totalUnidades;
-
-    document.getElementById("valorInventario").textContent =
-    "$" + valorInventario.toFixed(2);
-
-    document.getElementById("stockBajo").textContent =
-    stockBajo;
+function limpiarFormulario() {
+  document.getElementById("nombre").value = "";
+  document.getElementById("codigo").value = "";
+  document.getElementById("cantidad").value = "";
+  document.getElementById("precio").value = "";
+  editando = null;
+  document.getElementById("editIndicator").innerHTML = '';
 }
 
-function editarProducto(index){
-
-    let p = inventario[index];
-
-    document.getElementById("nombre").value =
-    p.nombre;
-
-    document.getElementById("codigo").value =
-    p.codigo;
-
-    document.getElementById("categoria").value =
-    p.categoria;
-
-    document.getElementById("cantidad").value =
-    p.cantidad;
-
-    document.getElementById("precio").value =
-    p.precio;
-
-    editando = index;
+function exportarCSV() {
+  if (!inventario.length) return alert("Sin datos");
+  let csv = "Codigo,Nombre,Categoria,Cantidad,Precio\n";
+  inventario.forEach(p => csv += `${p.codigo},${p.nombre},${p.categoria},${p.cantidad},${p.precio}\n`);
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = "inventario_ISC.csv";
+  a.click();
 }
 
-function eliminarProducto(index){
-
-    if(confirm("¿Eliminar producto?")){
-
-        inventario.splice(index,1);
-
-        localStorage.setItem(
-            "inventarioISC",
-            JSON.stringify(inventario)
-        );
-
-        mostrarProductos();
-    }
+// ============================
+//  DASHBOARD (KPIs + gráficos)
+// ============================
+function actualizarDashboards() {
+  const total = inventario.length;
+  let unidades = 0, valor = 0, bajo = 0;
+  inventario.forEach(p => {
+    unidades += p.cantidad;
+    valor += p.cantidad * p.precio;
+    if (p.cantidad < 10) bajo++;
+  });
+  document.getElementById("dashTotal").textContent = total;
+  document.getElementById("dashUnidades").textContent = unidades;
+  document.getElementById("dashValor").textContent = "$" + valor.toFixed(2);
+  document.getElementById("dashBajo").textContent = bajo;
+  document.getElementById("dashResumen").textContent = `📌 ${total} productos · ${unidades} unidades · valor total $${valor.toFixed(2)} · ${bajo} alertas de stock bajo.`;
 }
 
-function limpiarFormulario(){
+function actualizarGraficos() {
+  const categorias = [...new Set(inventario.map(p => p.categoria))];
+  const counts = categorias.map(cat => inventario.filter(p => p.categoria === cat).reduce((a, p) => a + p.cantidad, 0));
+  const valores = categorias.map(cat => inventario.filter(p => p.categoria === cat).reduce((a, p) => a + (p.cantidad * p.precio), 0));
 
-    document.getElementById("nombre").value = "";
-    document.getElementById("codigo").value = "";
-    document.getElementById("cantidad").value = "";
-    document.getElementById("precio").value = "";
+  const ctx1 = document.getElementById('chartCategorias').getContext('2d');
+  const ctx2 = document.getElementById('chartValorCategoria').getContext('2d');
+
+  if (chartCategoria) chartCategoria.destroy();
+  if (chartValorCategoria) chartValorCategoria.destroy();
+
+  const colores = ['#1f7a4d','#3da06a','#7ab893','#b3d9c4','#4b8c6b','#267a53'];
+  chartCategoria = new Chart(ctx1, {
+    type: 'bar',
+    data: { labels: categorias.length ? categorias : ['Sin datos'], datasets: [{ label: 'Unidades', data: categorias.length ? counts : [0], backgroundColor: colores, borderRadius: 8 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: '#e2ede6' } }, x: { grid: { display: false } } } }
+  });
+
+  chartValorCategoria = new Chart(ctx2, {
+    type: 'bar',
+    data: { labels: categorias.length ? categorias : ['Sin datos'], datasets: [{ label: 'Valor ($)', data: categorias.length ? valores : [0], backgroundColor: ['#1a5f7a','#2f7f9e','#5b9fb8','#8bbfd4','#3f7a8a','#1e5a6b'], borderRadius: 8 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: '#e2ede6' } }, x: { grid: { display: false } } } }
+  });
 }
 
-function exportarCSV(){
-
-    let csv =
-    "Codigo,Nombre,Categoria,Cantidad,Precio\n";
-
-    inventario.forEach(p=>{
-        csv += `${p.codigo},${p.nombre},${p.categoria},${p.cantidad},${p.precio}\n`;
-    });
-
-    const blob =
-    new Blob([csv], {type:'text/csv'});
-
-    const a =
-    document.createElement('a');
-
-    a.href =
-    URL.createObjectURL(blob);
-
-    a.download =
-    "inventario_industria_san_carlos.csv";
-
-    a.click();
+// ============================
+//  PROVEEDORES (pantalla 3)
+// ============================
+function renderProveedores() {
+  const container = document.getElementById('listaProveedores');
+  container.innerHTML = '';
+  proveedores.forEach((p, i) => {
+    container.innerHTML += `
+    <div class="list-item">
+      <span><strong>${p.nombre}</strong> <span style="font-size:0.7rem; color:#3d6e52;">(compras: ${p.compras})</span></span>
+      <span style="font-size:0.7rem; color:#2b6b47;">último: ${p.ultimo}</span>
+    </div>`;
+  });
+  // últimas compras simuladas
+  const comprasContainer = document.getElementById('ultimasCompras');
+  const items = [
+    { prod: 'Tornillos M8', cant: 120, total: 240 },
+    { prod: 'Cable 2.5mm', cant: 80, total: 400 },
+    { prod: 'Pintura blanca', cant: 15, total: 225 },
+  ];
+  comprasContainer.innerHTML = '';
+  let totalGastado = 0;
+  items.forEach(item => {
+    totalGastado += item.total;
+    comprasContainer.innerHTML += `
+    <div class="list-item">
+      <span>${item.prod} <span style="color:#3d6e52;">x${item.cant}</span></span>
+      <span>$${item.total.toFixed(2)}</span>
+    </div>`;
+  });
+  document.getElementById('totalGastado').textContent = '$' + totalGastado.toFixed(2);
 }
 
-mostrarProductos();
+function agregarProveedor() {
+  const input = document.getElementById('nuevoProveedor');
+  const nombre = input.value.trim();
+  if (!nombre) return alert('Ingresa un nombre');
+  proveedores.push({ nombre, compras: 0, ultimo: new Date().toISOString().slice(0,10) });
+  input.value = '';
+  renderProveedores();
+}
 
+// ============================
+//  INIT (carga inicial)
+// ============================
+// Mostrar splash, el contenido se muestra al hacer clic.
+// Pero si ya hay datos, los mostramos cuando se navegue.
+document.addEventListener('DOMContentLoaded', () => {
+  // precargar datos
+  mostrarProductos();
+  actualizarDashboards();
+  actualizarGraficos();
+  renderProveedores();
+});
 </script>
 
 </body>
