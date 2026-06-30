@@ -1,1011 +1,1037 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ISC · Industria San Carlos</title>
-  <!-- Chart.js para gráficos -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <title>Industrias San Carlos · Sistema de Precios</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+      font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
     }
 
     body {
-      background: #eef3f0;
-      color: #0b2a1e;
+      background: #f4f7fc;
+      color: #1e293b;
+      transition: background 0.3s, color 0.3s;
       min-height: 100vh;
+      padding: 1.5rem 1.5rem 4rem;
     }
 
-    /* ========== PANTALLA DE INICIO (LOGO GRANDE) ========== */
-    #splashScreen {
-      position: fixed;
-      inset: 0;
-      background: linear-gradient(145deg, #0f3b28, #1b6e4a);
+    body.dark {
+      background: #0b1a2b;
+      color: #e2e8f0;
+    }
+
+    .container {
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+
+    .header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 1rem 1.8rem;
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      padding: 1rem 2rem;
+      border-radius: 48px;
+      box-shadow: 0 8px 24px rgba(0, 20, 40, 0.08);
+      margin-bottom: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      transition: background 0.3s;
+    }
+
+    body.dark .header {
+      background: rgba(16, 34, 58, 0.7);
+      border-color: rgba(255, 255, 255, 0.05);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .logo-area img {
+      height: 48px;
+      width: auto;
+      border-radius: 10px;
+      object-fit: contain;
+      background: white;
+      padding: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .logo-text {
       display: flex;
       flex-direction: column;
+      line-height: 1.2;
+    }
+
+    .logo-text .brand {
+      font-weight: 700;
+      font-size: 1.5rem;
+      letter-spacing: -0.5px;
+      color: #0b2b4a;
+    }
+
+    body.dark .logo-text .brand {
+      color: #b6d4f0;
+    }
+
+    .logo-text .sub {
+      font-size: 0.75rem;
+      font-weight: 400;
+      color: #3b5f7a;
+      letter-spacing: 0.3px;
+    }
+
+    body.dark .logo-text .sub {
+      color: #95b3cf;
+    }
+
+    .header-actions {
+      margin-left: auto;
+      display: flex;
       align-items: center;
-      justify-content: center;
-      z-index: 9999;
-      transition: opacity 0.6s ease, visibility 0.6s ease;
-      padding: 2rem;
+      gap: 0.8rem;
+    }
+
+    .theme-toggle {
+      background: rgba(0,0,0,0.04);
+      border: none;
+      border-radius: 40px;
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #1a3a55;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    body.dark .theme-toggle {
+      background: #1e3a5a;
+      color: #d0e2f5;
+    }
+
+    .theme-toggle i {
+      font-size: 1.1rem;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+      background: rgba(255,255,255,0.3);
+      backdrop-filter: blur(4px);
+      padding: 1.2rem 1.8rem;
+      border-radius: 40px;
+      border: 1px solid rgba(255,255,255,0.4);
+    }
+
+    body.dark .stats-grid {
+      background: rgba(10, 30, 50, 0.5);
+      border-color: rgba(255,255,255,0.05);
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 500;
+    }
+
+    .stat-item i {
+      color: #1f6390;
+      font-size: 1.2rem;
+      width: 1.8rem;
       text-align: center;
     }
 
-    #splashScreen.hidden {
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
+    body.dark .stat-item i {
+      color: #5f9ed0;
     }
 
-    .splash-logo {
-      background: white;
-      border-radius: 60px;
-      padding: 24px 30px;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
-      margin-bottom: 2rem;
-      border: 4px solid #d4edda;
-      transition: transform 0.3s ease;
-    }
-
-    .splash-logo img {
-      width: 180px;
-      height: 180px;
-      object-fit: contain;
-      display: block;
-    }
-
-    .splash-title {
-      color: white;
-      font-size: 2.8rem;
+    .stat-value {
       font-weight: 700;
-      letter-spacing: -0.5px;
-      text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      font-size: 1.2rem;
+      margin-right: 0.2rem;
     }
 
-    .splash-sub {
-      color: #c6e6d3;
-      font-size: 1.1rem;
-      margin: 0.5rem 0 2rem 0;
-      font-weight: 300;
-      letter-spacing: 2px;
-    }
-
-    .splash-buttons {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 18px;
-    }
-
-    .splash-btn {
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(6px);
-      border: 1.5px solid rgba(255, 255, 255, 0.25);
-      color: white;
-      padding: 14px 38px;
-      border-radius: 60px;
-      font-weight: 600;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: 0.2s;
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-
-    .splash-btn:hover {
+    .search-section {
       background: white;
-      color: #0f3b28;
-      transform: scale(1.03);
-      border-color: white;
-    }
-
-    .splash-btn-primary {
-      background: #ffd966;
-      color: #1f4d2f;
-      border-color: #ffd966;
-    }
-
-    .splash-btn-primary:hover {
-      background: #ffe28a;
-      border-color: #ffe28a;
-      color: #0f3b28;
-    }
-
-    /* ========== APP (contenido principal) ========== */
-    #appContent {
-      display: block;
-      max-width: 1500px;
-      margin: 0 auto;
-      padding: 1.2rem 1.8rem 2rem 1.8rem;
-    }
-
-    /* header interno */
-    .app-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 16px;
-      margin-bottom: 1.8rem;
-      padding-bottom: 0.6rem;
-      border-bottom: 2px solid #d4e4db;
-    }
-
-    .app-header-left {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .app-header-left img {
-      width: 52px;
-      height: 52px;
-      object-fit: contain;
-      background: white;
-      border-radius: 30px;
-      padding: 6px;
-      border: 1px solid #b8d5c4;
-    }
-
-    .app-header-left h2 {
-      color: #15482e;
-      font-weight: 600;
-    }
-
-    .nav-tabs {
-      display: flex;
-      gap: 6px;
-      background: #e3eee7;
-      padding: 5px;
-      border-radius: 60px;
-      flex-wrap: wrap;
-    }
-
-    .nav-tab {
-      border: none;
-      background: transparent;
-      padding: 8px 18px;
+      padding: 1.5rem 2rem;
       border-radius: 40px;
-      font-weight: 600;
-      color: #235b3d;
-      cursor: pointer;
-      transition: 0.15s;
-      font-size: 0.85rem;
+      box-shadow: 0 8px 24px rgba(0, 20, 40, 0.06);
+      margin-bottom: 2rem;
+      transition: background 0.3s;
     }
 
-    .nav-tab.active {
-      background: white;
-      box-shadow: 0 2px 8px rgba(0, 30, 10, 0.08);
-      color: #0f3b28;
+    body.dark .search-section {
+      background: #102b41;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
     }
 
-    .nav-tab:hover:not(.active) {
-      background: rgba(255,255,255,0.3);
-    }
-
-    .btn-back-menu {
-      background: rgba(255,255,255,0.7);
-      border: 1px solid #b8d5c4;
-      color: #15482e;
-      padding: 6px 14px;
-      border-radius: 40px;
-      font-size: 0.75rem;
-      cursor: pointer;
-      transition: 0.2s;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      font-weight: 600;
-    }
-
-    .btn-back-menu:hover {
-      background: white;
-      border-color: #1a754b;
-      transform: scale(1.02);
-    }
-
-    /* ===== PANTALLAS (secciones) ===== */
-    .screen {
-      display: none;
-      animation: fadeUp 0.25s ease;
-    }
-
-    .screen.active {
-      display: block;
-    }
-
-    @keyframes fadeUp {
-      0% { opacity: 0; transform: translateY(12px); }
-      100% { opacity: 1; transform: translateY(0); }
-    }
-
-    .screen-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1.5rem;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-
-    .screen-header h3 {
-      color: #1f543a;
-      font-size: 1.3rem;
-    }
-
-    /* ===== REGISTRO (pantalla 1) ===== */
-    .register-grid {
-      display: grid;
-      grid-template-columns: 1fr 1.2fr;
-      gap: 1.8rem;
-    }
-
-    @media (max-width: 900px) {
-      .register-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .form-card {
-      background: white;
-      border-radius: 28px;
-      padding: 1.8rem;
-      box-shadow: 0 6px 18px rgba(0,20,0,0.04);
-      border: 1px solid #eaf3ee;
-    }
-
-    .form-card h3 {
-      color: #1f543a;
-      margin-bottom: 1.2rem;
-    }
-
-    .form-2col {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .form-2col input, .form-2col select {
-      padding: 12px 14px;
-      border: 1px solid #d5e2db;
-      border-radius: 16px;
-      font-size: 0.9rem;
-      background: #fafdfb;
-    }
-
-    .form-2col input:focus, .form-2col select:focus {
-      border-color: #1a754b;
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(30,125,80,0.12);
-    }
-
-    .acciones-row {
+    .search-bar {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 1.4rem;
-    }
-
-    .btn {
-      border: none;
-      padding: 10px 24px;
-      border-radius: 40px;
-      font-weight: 600;
-      font-size: 0.85rem;
-      cursor: pointer;
-      transition: 0.1s;
-      display: inline-flex;
+      gap: 1rem;
       align-items: center;
-      gap: 6px;
     }
 
-    .btn-primary { background: #1a754b; color: white; }
-    .btn-primary:hover { background: #0f5f3a; }
-    .btn-danger { background: #c0392b; color: white; }
-    .btn-danger:hover { background: #a93226; }
-    .btn-outline { background: transparent; border: 1.5px solid #1a754b; color: #1a754b; }
-    .btn-outline:hover { background: #e8f5ee; }
-    .btn-export { background: #1f4e7a; color: white; }
-    .btn-export:hover { background: #153b5c; }
-    .btn-warning { background: #f39c12; color: white; }
-    .btn-warning:hover { background: #d68910; }
-
-    .table-wrap {
-      background: white;
-      border-radius: 24px;
-      padding: 0.2rem 0.2rem 0.2rem 0.2rem;
-      border: 1px solid #eaf3ee;
-      overflow-x: auto;
+    .search-input-wrap {
+      flex: 2;
+      min-width: 200px;
+      position: relative;
     }
 
-    .table-wrap table {
+    .search-input-wrap i {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #6b8ba0;
+    }
+
+    .search-input-wrap input {
       width: 100%;
-      border-collapse: collapse;
-      font-size: 0.85rem;
+      padding: 0.8rem 1rem 0.8rem 3rem;
+      border: 1px solid #dce7f2;
+      border-radius: 60px;
+      font-size: 1rem;
+      background: #f5f9ff;
+      transition: 0.2s;
     }
 
-    .table-wrap th {
-      background: #eaf3ee;
-      color: #15482e;
-      padding: 12px 8px;
-      text-align: left;
+    body.dark .search-input-wrap input {
+      background: #1b3853;
+      border-color: #2f5270;
+      color: #eaf1f9;
+    }
+
+    .search-input-wrap input:focus {
+      outline: none;
+      border-color: #1f6390;
+      box-shadow: 0 0 0 3px rgba(31, 99, 144, 0.15);
+    }
+
+    .filter-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      align-items: center;
+      flex: 1;
+    }
+
+    .filter-group select {
+      padding: 0.7rem 1.2rem;
+      border-radius: 60px;
+      border: 1px solid #d0dfec;
+      background: white;
+      font-size: 0.9rem;
+      cursor: pointer;
+      min-width: 150px;
+    }
+
+    body.dark .filter-group select {
+      background: #1d3a53;
+      border-color: #335a78;
+      color: #e4edf5;
+    }
+
+    .filter-group select:focus {
+      outline: none;
+      border-color: #1f6390;
+    }
+
+    .btn-clear {
+      background: #eef3f9;
+      border: none;
+      padding: 0.7rem 1.5rem;
+      border-radius: 60px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: 0.2s;
+      color: #1a3a55;
       white-space: nowrap;
     }
 
-    .table-wrap td {
-      padding: 10px 8px;
-      border-bottom: 1px solid #e3eee7;
+    body.dark .btn-clear {
+      background: #274b68;
+      color: #d0e2f0;
     }
 
-    .estado-bajo { background: #fee9e7; color: #b33a34; padding: 2px 12px; border-radius: 40px; font-weight: 600; font-size:0.7rem; display:inline-block; }
-    .estado-normal { background: #e1f3e8; color: #146b3f; padding: 2px 12px; border-radius: 40px; font-weight: 600; font-size:0.7rem; display:inline-block; }
-    .btn-icon { border: none; background: transparent; padding: 4px 10px; border-radius: 40px; cursor: pointer; font-weight:600; font-size:0.7rem; }
-    .btn-edit { background: #fff1d6; color: #b7811a; }
-    .btn-delete { background: #fde6e3; color: #b3413a; }
-    .btn-salida { background: #d6eaf8; color: #1a5276; }
-
-    /* ===== SALIDAS (pantalla 4) ===== */
-    .salidas-grid {
-      display: grid;
-      grid-template-columns: 1fr 1.2fr;
-      gap: 1.8rem;
+    .btn-clear:hover {
+      background: #d5e2f0;
     }
 
-    @media (max-width: 900px) {
-      .salidas-grid {
-        grid-template-columns: 1fr;
-      }
+    .sort-select {
+      margin-left: auto;
     }
 
-    .select-material {
-      padding: 12px 14px;
-      border: 1px solid #d5e2db;
-      border-radius: 16px;
+    .sort-select select {
+      padding: 0.7rem 1.2rem;
+      border-radius: 60px;
+      border: 1px solid #d0dfec;
+      background: white;
       font-size: 0.9rem;
-      background: #fafdfb;
-      width: 100%;
+      cursor: pointer;
     }
 
-    .select-material:focus {
-      border-color: #1a754b;
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(30,125,80,0.12);
+    body.dark .sort-select select {
+      background: #1d3a53;
+      border-color: #335a78;
+      color: #e4edf5;
     }
 
-    /* ===== DASHBOARD (pantalla 2) ===== */
-    .dash-grid {
+    .cards-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 1.2rem;
-      margin-bottom: 2rem;
-    }
-
-    .kpi-card {
-      background: white;
-      border-radius: 24px;
-      padding: 1.2rem;
-      box-shadow: 0 4px 14px rgba(0,20,0,0.04);
-      border: 1px solid #eaf3ee;
-    }
-
-    .kpi-card h4 { font-size: 0.7rem; text-transform: uppercase; color: #2b6b47; opacity: 0.7; }
-    .kpi-card .value { font-size: 2.2rem; font-weight: 700; color: #0d3422; }
-    .kpi-card .sub { font-size: 0.75rem; color: #3b6b50; }
-
-    .chart-double {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
       gap: 1.8rem;
-      margin-bottom: 1.8rem;
+      margin-top: 1.5rem;
     }
 
-    @media (max-width: 800px) {
-      .chart-double { grid-template-columns: 1fr; }
-    }
-
-    .chart-box {
+    .card {
       background: white;
       border-radius: 28px;
-      padding: 1.2rem;
-      border: 1px solid #eaf3ee;
+      padding: 1.6rem 1.8rem;
+      box-shadow: 0 12px 30px rgba(0, 20, 40, 0.08);
+      transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(2px);
+      animation: fadeUp 0.4s ease;
     }
 
-    .chart-box h4 { color: #1f543a; margin-bottom: 0.6rem; }
-    .chart-container { height: 180px; width: 100%; position: relative; }
-
-    /* ===== PROVEEDORES (pantalla 3) ===== */
-    .proveedores-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.8rem;
+    body.dark .card {
+      background: #12324b;
+      border-color: #1f4665;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.6);
     }
 
-    @media (max-width: 800px) {
-      .proveedores-grid { grid-template-columns: 1fr; }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 36px rgba(0, 20, 40, 0.12);
     }
 
-    .prov-card {
-      background: white;
-      border-radius: 28px;
-      padding: 1.4rem 1.6rem;
-      border: 1px solid #eaf3ee;
-      box-shadow: 0 4px 14px rgba(0,20,0,0.03);
+    .card .article {
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      margin-bottom: 0.3rem;
+      color: #0d2c47;
     }
 
-    .prov-card h4 { color: #1f543a; margin-bottom: 0.4rem; }
-    .prov-badge { background: #e5f2ea; padding: 2px 14px; border-radius: 40px; font-size: 0.7rem; color: #146b3f; }
+    body.dark .card .article {
+      color: #cde1f5;
+    }
 
-    .list-item {
+    .card .price-unit {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #0b6b4c;
+      background: #e4f3ec;
+      display: inline-block;
+      padding: 0.1rem 1rem;
+      border-radius: 60px;
+      margin: 0.5rem 0 0.8rem;
+    }
+
+    body.dark .card .price-unit {
+      background: #1a4f3d;
+      color: #9bddc4;
+    }
+
+    .card .detail-row {
       display: flex;
       justify-content: space-between;
-      border-bottom: 1px solid #e3eee7;
-      padding: 10px 0;
+      font-size: 0.9rem;
+      padding: 0.3rem 0;
+      border-bottom: 1px solid #eaf0f6;
     }
 
-    .list-item:last-child { border-bottom: none; }
+    body.dark .card .detail-row {
+      border-color: #264c68;
+    }
 
-    .splash-btn-back {
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.15);
-      color: white;
-      padding: 8px 18px;
-      border-radius: 40px;
-      cursor: pointer;
+    .card .detail-row span:last-child {
       font-weight: 500;
-      transition: 0.1s;
-      margin-top: 24px;
     }
 
-    .splash-btn-back:hover {
-      background: rgba(255,255,255,0.2);
+    .card-actions {
+      margin-top: 1rem;
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
     }
 
-    /* util */
-    .mt-2 { margin-top: 1.2rem; }
-    .flex { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .text-muted { color: #3a6b51; }
-    .w-full { width: 100%; }
-    .mb-2 { margin-bottom: 1rem; }
-    .gap-2 { gap: 12px; }
+    .card-actions button {
+      background: transparent;
+      border: 1px solid #cbddee;
+      padding: 0.3rem 0.9rem;
+      border-radius: 40px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: 0.15s;
+      color: #1a3a55;
+    }
+
+    body.dark .card-actions button {
+      border-color: #35658a;
+      color: #c7dff5;
+    }
+
+    .card-actions button:hover {
+      background: #dce8f5;
+    }
+
+    .analysis-panel {
+      margin-top: 2.5rem;
+      background: white;
+      border-radius: 40px;
+      padding: 1.8rem 2.2rem;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.04);
+      transition: background 0.3s;
+    }
+
+    body.dark .analysis-panel {
+      background: #0e2a41;
+    }
+
+    .analysis-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin: 1rem 0 1.5rem;
+    }
+
+    .analysis-item {
+      background: #f2f8ff;
+      padding: 0.8rem 1.2rem;
+      border-radius: 60px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    body.dark .analysis-item {
+      background: #1d3f5b;
+    }
+
+    .analysis-item .label {
+      font-weight: 400;
+      color: #3b607b;
+    }
+
+    body.dark .analysis-item .label {
+      color: #acc9e0;
+    }
+
+    .analysis-item .value {
+      font-weight: 700;
+    }
+
+    .history-timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      margin-top: 1rem;
+    }
+
+    .history-item {
+      background: #f2f8fe;
+      padding: 0.8rem 1.4rem;
+      border-radius: 60px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 1.8rem;
+      border-left: 4px solid #256f9c;
+      font-size: 0.9rem;
+    }
+
+    body.dark .history-item {
+      background: #1b3f5a;
+      border-left-color: #4d91c0;
+    }
+
+    .history-item .date {
+      font-weight: 500;
+      color: #1c4f72;
+    }
+
+    body.dark .history-item .date {
+      color: #b3d6f0;
+    }
+
+    .loader-overlay {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 4rem 1rem;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .loader {
+      width: 50px;
+      height: 50px;
+      border: 5px solid #d0dfec;
+      border-top: 5px solid #1f6390;
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .no-results {
+      text-align: center;
+      padding: 3rem;
+      font-size: 1.2rem;
+      color: #3e6b88;
+    }
+
+    body.dark .no-results {
+      color: #a8c8e0;
+    }
+
+    .fade-in { animation: fadeUp 0.4s ease; }
+
+    @keyframes fadeUp {
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .back-top {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: #1f6390;
+      color: white;
+      border: none;
+      border-radius: 60px;
+      padding: 0.7rem 1.2rem;
+      font-weight: 600;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      cursor: pointer;
+      transition: 0.2s;
+      z-index: 99;
+    }
+
+    .back-top:hover { background: #104a6e; transform: scale(1.03); }
+
+    @media (max-width: 700px) {
+      .header { flex-direction: column; align-items: stretch; }
+      .header-actions { margin-left: 0; justify-content: flex-end; }
+      .stats-grid { grid-template-columns: repeat(2,1fr); }
+      .search-section { padding: 1.2rem; }
+      .search-bar { flex-direction: column; align-items: stretch; }
+      .filter-group { flex-direction: column; align-items: stretch; }
+      .sort-select { margin-left: 0; }
+    }
+
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #e2ecf5; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb { background: #256f9c; border-radius: 10px; }
   </style>
 </head>
 <body>
+<div class="container" id="app">
+  <header class="header">
+    <div class="logo-area">
+      <img src="logo.jpeg" alt="Industrias San Carlos" id="logoImg" onerror="this.style.display='none'">
+      <div class="logo-text">
+        <span class="brand">Industrias San Carlos</span>
+        <span class="sub"><i class="fas fa-chart-line" style="margin-right:4px;"></i>Sistema Inteligente de Consulta de Precios</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i> <span id="themeLabel">Modo oscuro</span></button>
+      <span style="font-size:0.85rem; opacity:0.7;"><i class="fas fa-sync-alt fa-fw"></i> <span id="lastUpdateLabel">Actualizando...</span></span>
+    </div>
+  </header>
 
-<!-- ========== SPLASH (LOGO GRANDE) ========== -->
-<div id="splashScreen">
-  <div class="splash-logo">
-    <img src="logo.jpeg" alt="Logo ISC">
+  <div class="stats-grid" id="statsGrid">
+    <div class="stat-item"><i class="fas fa-cubes"></i><span><span class="stat-value" id="totalArticulos">0</span> artículos</span></div>
+    <div class="stat-item"><i class="fas fa-file-invoice"></i><span><span class="stat-value" id="totalFacturas">0</span> facturas</span></div>
+    <div class="stat-item"><i class="fas fa-building"></i><span><span class="stat-value" id="totalProveedores">0</span> proveedores</span></div>
+    <div class="stat-item"><i class="fas fa-clock"></i><span><span class="stat-value" id="ultimaActualizacion">--</span></span></div>
   </div>
-  <div class="splash-title">Industria San Carlos</div>
-  <div class="splash-sub">Ecosistema · Tecnología Ecológica</div>
 
-  <div class="splash-buttons">
-    <button class="splash-btn splash-btn-primary" onclick="navegarA('registro')">📋 Registro</button>
-    <button class="splash-btn" onclick="navegarA('dashboard')">📊 Dashboard</button>
-    <button class="splash-btn" onclick="navegarA('proveedores')">🏭 Proveedores</button>
-    <button class="splash-btn" onclick="navegarA('salidas')">📤 Salidas</button>
+  <section class="search-section">
+    <div class="search-bar">
+      <div class="search-input-wrap">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Buscar por artículo...">
+      </div>
+      <div class="filter-group">
+        <select id="filterProveedor">
+          <option value="">Todos los proveedores</option>
+        </select>
+        <select id="filterFecha">
+          <option value="">Todas las fechas</option>
+        </select>
+        <button class="btn-clear" id="clearFiltersBtn"><i class="fas fa-undo-alt"></i> Limpiar</button>
+      </div>
+      <div class="sort-select">
+        <select id="sortSelect">
+          <option value="reciente">Compra más reciente</option>
+          <option value="antiguo">Compra más antigua</option>
+          <option value="precioBajo">Precio más bajo</option>
+          <option value="precioAlto">Precio más alto</option>
+          <option value="alfabetico">Orden alfabético</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <div id="cardsContainer">
+    <div class="loader-overlay" id="loader"><div class="loader"></div><span>Cargando datos...</span></div>
+    <div class="cards-grid" id="cardsGrid" style="display:none;"></div>
+    <div class="no-results" id="noResults" style="display:none;"><i class="fas fa-search-minus" style="font-size:2rem; display:block; margin-bottom:0.5rem;"></i> No se encontraron resultados</div>
   </div>
-  <div style="margin-top: 2.5rem; color: #b0d5c0; font-size:0.8rem;">Selecciona una sección para comenzar</div>
+
+  <div class="analysis-panel" id="analysisPanel" style="display:none;">
+    <h3 style="display:flex; align-items:center; gap:0.5rem;"><i class="fas fa-chart-pie" style="color:#1f6390;"></i> Análisis de <span id="analysisArticleName" style="font-weight:700;">Artículo</span></h3>
+    <div class="analysis-grid" id="analysisGrid"></div>
+    <h4 style="margin:1rem 0 0.5rem;"><i class="fas fa-history"></i> Historial de compras</h4>
+    <div class="history-timeline" id="historyTimeline"></div>
+    <div style="margin-top:1.2rem; display:flex; gap:0.8rem; flex-wrap:wrap;">
+      <button class="btn-clear" id="printCardBtn"><i class="fas fa-print"></i> Imprimir ficha</button>
+      <button class="btn-clear" id="exportPdfBtn"><i class="fas fa-file-pdf"></i> Exportar PDF</button>
+    </div>
+  </div>
+
+  <button class="back-top" id="backToTop"><i class="fas fa-arrow-up"></i> Arriba</button>
 </div>
-
-<!-- ========== APP PRINCIPAL ========== -->
-<div id="appContent" style="display:none;">
-
-  <!-- header interno con navegación -->
-  <div class="app-header">
-    <div class="app-header-left">
-      <img src="logo.jpeg" alt="logo">
-      <h2>Industria San Carlos</h2>
-    </div>
-    <div class="nav-tabs">
-      <button class="nav-tab active" data-screen="registro" onclick="cambiarScreen('registro')">📋 Registro</button>
-      <button class="nav-tab" data-screen="dashboard" onclick="cambiarScreen('dashboard')">📊 Dashboard</button>
-      <button class="nav-tab" data-screen="proveedores" onclick="cambiarScreen('proveedores')">🏭 Proveedores</button>
-      <button class="nav-tab" data-screen="salidas" onclick="cambiarScreen('salidas')">📤 Salidas</button>
-    </div>
-  </div>
-
-  <!-- ========== PANTALLA 1: REGISTRO ========== -->
-  <div id="screen-registro" class="screen active">
-    <div class="screen-header">
-      <h3>✏️ Registro de Inventario</h3>
-      <button class="btn-back-menu" onclick="volverAlMenu()">🏠 Volver al menú</button>
-    </div>
-    <div class="register-grid">
-      <div class="form-card">
-        <h3>✏️ Agregar / Editar material</h3>
-        <div class="form-2col">
-          <input type="text" id="nombre" placeholder="Material">
-          <input type="text" id="codigo" placeholder="Código">
-          <select id="categoria">
-            <option>Herramientas</option><option>Tornillería</option>
-            <option>Electricidad</option><option>PVC</option>
-            <option>Pintura</option><option>Construcción</option>
-          </select>
-          <input type="number" id="cantidad" placeholder="Cantidad">
-          <input type="number" id="precio" placeholder="Precio unitario" step="0.01">
-        </div>
-        <div class="acciones-row">
-          <button class="btn btn-primary" onclick="guardarProducto()">💾 Guardar</button>
-          <button class="btn btn-outline" onclick="limpiarFormulario()">Limpiar</button>
-          <button class="btn btn-export" onclick="exportarCSV()">📤 Exportar CSV</button>
-        </div>
-        <div style="margin-top: 12px; font-size:0.8rem; color:#2e6043;" id="editIndicator"></div>
-      </div>
-
-      <div>
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap;">
-          <span style="font-weight:600; color:#15482e;">📋 Inventario</span>
-          <input type="text" id="buscar" placeholder="🔍 Buscar..." onkeyup="mostrarProductos()" style="padding:8px 16px; border-radius:40px; border:1px solid #d0dfd6; background:#f8fbf9; width:180px;">
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Código</th><th>Material</th><th>Categoría</th><th>Cant</th><th>Precio</th><th>Total</th><th>Estado</th><th>Acciones</th></tr></thead>
-            <tbody id="tablaInventario"></tbody>
-          </table>
-        </div>
-        <div style="padding:6px 0; font-size:0.7rem; color:#3d6e52; text-align:right;" id="registroCount"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ========== PANTALLA 2: DASHBOARD ========== -->
-  <div id="screen-dashboard" class="screen">
-    <div class="screen-header">
-      <h3>📊 Panel de Control</h3>
-      <button class="btn-back-menu" onclick="volverAlMenu()">🏠 Volver al menú</button>
-    </div>
-    <div class="dash-grid">
-      <div class="kpi-card"><h4>Total productos</h4><div class="value" id="dashTotal">0</div><div class="sub">activos</div></div>
-      <div class="kpi-card"><h4>Unidades totales</h4><div class="value" id="dashUnidades">0</div><div class="sub">en stock</div></div>
-      <div class="kpi-card"><h4>Valor inventario</h4><div class="value" id="dashValor">$0</div><div class="sub">USD</div></div>
-      <div class="kpi-card"><h4>⚠️ Stock bajo</h4><div class="value" id="dashBajo">0</div><div class="sub">alertas</div></div>
-    </div>
-
-    <div class="chart-double">
-      <div class="chart-box"><h4>📊 Cantidad por categoría</h4><div class="chart-container"><canvas id="chartCategorias"></canvas></div></div>
-      <div class="chart-box"><h4>💰 Valor por categoría</h4><div class="chart-container"><canvas id="chartValorCategoria"></canvas></div></div>
-    </div>
-    <div style="background:white; border-radius:28px; padding:1.2rem; border:1px solid #eaf3ee;">
-      <h4 style="color:#1f543a;">📈 Resumen rápido</h4>
-      <p style="color:#2d5f44;" id="dashResumen">Carga de datos...</p>
-    </div>
-  </div>
-
-  <!-- ========== PANTALLA 3: PROVEEDORES ========== -->
-  <div id="screen-proveedores" class="screen">
-    <div class="screen-header">
-      <h3>🏭 Proveedores</h3>
-      <button class="btn-back-menu" onclick="volverAlMenu()">🏠 Volver al menú</button>
-    </div>
-    <div class="proveedores-grid">
-      <div class="prov-card">
-        <div class="flex"><h4>🏭 Proveedores principales</h4><span class="prov-badge">activos</span></div>
-        <div id="listaProveedores"></div>
-        <div style="margin-top: 1rem; background:#f3f9f5; border-radius:20px; padding:0.8rem;">
-          <span style="font-weight:600; color:#1f543a;">➕ Agregar proveedor</span>
-          <div class="flex" style="margin-top:6px;">
-            <input type="text" id="nuevoProveedor" placeholder="Nombre" style="flex:1; padding:8px 14px; border-radius:40px; border:1px solid #d0dfd6;">
-            <button class="btn btn-primary" onclick="agregarProveedor()">Añadir</button>
-          </div>
-        </div>
-      </div>
-      <div class="prov-card">
-        <h4>📦 Últimas compras (simuladas)</h4>
-        <div id="ultimasCompras"></div>
-        <div style="margin-top: 0.8rem; background:#f3f9f5; border-radius:20px; padding:0.6rem 1rem;">
-          <span style="font-size:0.8rem; color:#2d5f44;">⚡ Total gastado en compras: <strong id="totalGastado">$0</strong></span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ========== PANTALLA 4: SALIDAS ========== -->
-  <div id="screen-salidas" class="screen">
-    <div class="screen-header">
-      <h3>📤 Registro de Salidas</h3>
-      <button class="btn-back-menu" onclick="volverAlMenu()">🏠 Volver al menú</button>
-    </div>
-    <div class="salidas-grid">
-      <div class="form-card">
-        <h3>📤 Registrar salida de material</h3>
-        <div style="margin-bottom: 12px;">
-          <label style="font-weight:600; color:#1f543a; font-size:0.85rem;">Seleccionar material</label>
-          <select id="selectMaterialSalida" class="select-material" onchange="actualizarStockDisponible()">
-            <option value="">-- Seleccionar --</option>
-          </select>
-        </div>
-        <div style="margin-bottom: 12px; background:#f3f9f5; padding:10px; border-radius:12px;">
-          <span style="font-size:0.85rem;">📦 Stock disponible: <strong id="stockDisponible">0</strong></span>
-        </div>
-        <div class="form-2col">
-          <input type="number" id="cantidadSalida" placeholder="Cantidad a retirar" min="1">
-          <input type="text" id="motivoSalida" placeholder="Motivo (ej: Venta, Uso interno)">
-        </div>
-        <div style="margin-top: 10px;">
-          <input type="text" id="destinoSalida" placeholder="Destino (ej: Obra, Cliente)" style="width:100%; padding:12px 14px; border:1px solid #d5e2db; border-radius:16px; font-size:0.9rem; background:#fafdfb;">
-        </div>
-        <div class="acciones-row">
-          <button class="btn btn-danger" onclick="registrarSalida()">📤 Registrar Salida</button>
-          <button class="btn btn-outline" onclick="limpiarSalida()">Limpiar</button>
-        </div>
-        <div style="margin-top: 12px; font-size:0.8rem; color:#2e6043;" id="salidaIndicator"></div>
-      </div>
-
-      <div>
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap;">
-          <span style="font-weight:600; color:#15482e;">📋 Historial de Salidas</span>
-          <span style="font-size:0.75rem; color:#3d6e52;" id="salidasCount"></span>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Material</th><th>Cantidad</th><th>Motivo</th><th>Destino</th><th>Fecha</th><th>Acciones</th></tr></thead>
-            <tbody id="tablaSalidas"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-
-</div>
-
 <script>
-// ============================
-//  DATOS Y ESTADO GLOBAL
-// ============================
-let inventario = JSON.parse(localStorage.getItem("inventarioISC")) || [];
-let salidas = JSON.parse(localStorage.getItem("salidasISC")) || [];
-let editando = null;
-let chartCategoria = null;
-let chartValorCategoria = null;
+  (function() {
+    "use strict";
 
-// Proveedores (simulados)
-let proveedores = [
-  { nombre: "Aceros del Norte", compras: 3, ultimo: "2025-05-12" },
-  { nombre: "ElectroCenter S.A.", compras: 5, ultimo: "2025-05-10" },
-  { nombre: "Distribuidora PVC", compras: 2, ultimo: "2025-05-08" },
-];
+    const DATA_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7YBui32JBbGTNLfR4FIRHWvu9xP-GJFaEisdpvOvAxVJLv0AVw6-9pOMAb44UVA/pub?output=csv';
 
-// ============================
-//  SPLASH / NAVEGACIÓN
-// ============================
-function navegarA(screen) {
-  document.getElementById('splashScreen').classList.add('hidden');
-  document.getElementById('appContent').style.display = 'block';
-  cambiarScreen(screen);
-  cargarDatos();
-}
+    const searchInput = document.getElementById('searchInput');
+    const filterProveedor = document.getElementById('filterProveedor');
+    const filterFecha = document.getElementById('filterFecha');
+    const sortSelect = document.getElementById('sortSelect');
+    const clearBtn = document.getElementById('clearFiltersBtn');
+    const cardsGrid = document.getElementById('cardsGrid');
+    const loader = document.getElementById('loader');
+    const noResults = document.getElementById('noResults');
+    const analysisPanel = document.getElementById('analysisPanel');
+    const analysisArticleName = document.getElementById('analysisArticleName');
+    const analysisGrid = document.getElementById('analysisGrid');
+    const historyTimeline = document.getElementById('historyTimeline');
+    const totalArticulos = document.getElementById('totalArticulos');
+    const totalFacturas = document.getElementById('totalFacturas');
+    const totalProveedores = document.getElementById('totalProveedores');
+    const ultimaActualizacion = document.getElementById('ultimaActualizacion');
+    const themeToggle = document.getElementById('themeToggle');
+    const themeLabel = document.getElementById('themeLabel');
+    const backToTop = document.getElementById('backToTop');
 
-function volverAlMenu() {
-  document.getElementById('splashScreen').classList.remove('hidden');
-  document.getElementById('appContent').style.display = 'none';
-  // Resetear tabs
-  document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
-}
+    let allData = [];
+    let filteredData = [];
+    let currentCardIndex = -1;
 
-function cambiarScreen(screen) {
-  document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
-  document.getElementById('screen-' + screen).classList.add('active');
-  document.querySelector(`.nav-tab[data-screen="${screen}"]`)?.classList.add('active');
-  cargarDatos();
-}
-
-function cargarDatos() {
-  mostrarProductos();
-  actualizarDashboards();
-  actualizarGraficos();
-  renderProveedores();
-  actualizarSelectSalidas();
-  mostrarSalidas();
-}
-
-// ============================
-//  CRUD INVENTARIO
-// ============================
-function guardarProducto() {
-  const nombre = document.getElementById("nombre").value.trim();
-  const codigo = document.getElementById("codigo").value.trim();
-  const categoria = document.getElementById("categoria").value;
-  const cantidad = Number(document.getElementById("cantidad").value);
-  const precio = Number(document.getElementById("precio").value);
-  if (!nombre || !codigo || cantidad <= 0 || precio <= 0) {
-    alert("Completa todos los campos (cantidad y precio > 0)");
-    return;
-  }
-  const producto = { nombre, codigo, categoria, cantidad, precio };
-  if (editando !== null) {
-    inventario[editando] = producto;
-    editando = null;
-    document.getElementById("editIndicator").innerHTML = '';
-  } else {
-    inventario.push(producto);
-  }
-  localStorage.setItem("inventarioISC", JSON.stringify(inventario));
-  limpiarFormulario();
-  cargarDatos();
-}
-
-function mostrarProductos() {
-  const filtro = document.getElementById("buscar").value.toLowerCase();
-  const tbody = document.getElementById("tablaInventario");
-  tbody.innerHTML = "";
-  let totalUnidades = 0, valorInv = 0, stockBajo = 0;
-  inventario.forEach((p, idx) => {
-    const match = p.nombre.toLowerCase().includes(filtro) || p.codigo.toLowerCase().includes(filtro);
-    if (!match) return;
-    totalUnidades += p.cantidad;
-    valorInv += p.cantidad * p.precio;
-    if (p.cantidad < 10) stockBajo++;
-    const estado = p.cantidad < 10 ? '<span class="estado-bajo">Bajo</span>' : '<span class="estado-normal">Normal</span>';
-    tbody.innerHTML += `
-    <tr>
-      <td>${p.codigo}</td><td>${p.nombre}</td><td>${p.categoria}</td>
-      <td>${p.cantidad}</td><td>$${p.precio.toFixed(2)}</td>
-      <td>$${(p.cantidad*p.precio).toFixed(2)}</td>
-      <td>${estado}</td>
-      <td>
-        <button class="btn-icon btn-edit" onclick="editarProducto(${idx})">✎</button>
-        <button class="btn-icon btn-delete" onclick="eliminarProducto(${idx})">✕</button>
-      </td>
-    </tr>`;
-  });
-  document.getElementById("registroCount").textContent = `Mostrando ${tbody.children.length} de ${inventario.length}`;
-}
-
-function editarProducto(index) {
-  const p = inventario[index];
-  document.getElementById("nombre").value = p.nombre;
-  document.getElementById("codigo").value = p.codigo;
-  document.getElementById("categoria").value = p.categoria;
-  document.getElementById("cantidad").value = p.cantidad;
-  document.getElementById("precio").value = p.precio;
-  editando = index;
-  document.getElementById("editIndicator").innerHTML = `✏️ Editando: <strong>${p.nombre}</strong>`;
-}
-
-function eliminarProducto(index) {
-  if (confirm("¿Eliminar este producto del inventario?")) {
-    inventario.splice(index, 1);
-    localStorage.setItem("inventarioISC", JSON.stringify(inventario));
-    if (editando === index) { editando = null; document.getElementById("editIndicator").innerHTML = ''; }
-    cargarDatos();
-  }
-}
-
-function limpiarFormulario() {
-  document.getElementById("nombre").value = "";
-  document.getElementById("codigo").value = "";
-  document.getElementById("cantidad").value = "";
-  document.getElementById("precio").value = "";
-  editando = null;
-  document.getElementById("editIndicator").innerHTML = '';
-}
-
-function exportarCSV() {
-  if (!inventario.length) return alert("Sin datos");
-  let csv = "Codigo,Nombre,Categoria,Cantidad,Precio\n";
-  inventario.forEach(p => csv += `${p.codigo},${p.nombre},${p.categoria},${p.cantidad},${p.precio}\n`);
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = "inventario_ISC.csv";
-  a.click();
-}
-
-// ============================
-//  SALIDAS DE INVENTARIO
-// ============================
-function actualizarSelectSalidas() {
-  const select = document.getElementById("selectMaterialSalida");
-  select.innerHTML = '<option value="">-- Seleccionar --</option>';
-  inventario.forEach((p, idx) => {
-    if (p.cantidad > 0) {
-      select.innerHTML += `<option value="${idx}">${p.nombre} (${p.codigo}) - Stock: ${p.cantidad}</option>`;
+    function parseDate(str) {
+      if (!str) return null;
+      if (typeof str === 'string') {
+        const parts = str.split('/');
+        if (parts.length === 3) {
+          const d = new Date(parts[2], parts[1]-1, parts[0]);
+          if (!isNaN(d)) return d;
+        }
+        const d = new Date(str);
+        if (!isNaN(d)) return d;
+        const parts2 = str.split('-');
+        if (parts2.length === 3) {
+          const months = { 'ene':0, 'feb':1, 'mar':2, 'abr':3, 'may':4, 'jun':5, 'jul':6, 'ago':7, 'sep':8, 'oct':9, 'nov':10, 'dic':11 };
+          const month = months[parts2[1].toLowerCase()];
+          if (month !== undefined) {
+            const d = new Date(parts2[2], month, parts2[0]);
+            if (!isNaN(d)) return d;
+          }
+        }
+      }
+      return null;
     }
-  });
-}
 
-function actualizarStockDisponible() {
-  const idx = document.getElementById("selectMaterialSalida").value;
-  if (idx !== "") {
-    const producto = inventario[parseInt(idx)];
-    document.getElementById("stockDisponible").textContent = producto.cantidad;
-    document.getElementById("cantidadSalida").max = producto.cantidad;
-  } else {
-    document.getElementById("stockDisponible").textContent = "0";
-  }
-}
+    function formatDate(d) {
+      if (!d) return '—';
+      if (typeof d === 'string') d = parseDate(d);
+      if (!d || isNaN(d)) return '—';
+      return d.toLocaleDateString('es-ES', {day:'2-digit', month:'short', year:'numeric'});
+    }
 
-function registrarSalida() {
-  const idx = document.getElementById("selectMaterialSalida").value;
-  const cantidad = Number(document.getElementById("cantidadSalida").value);
-  const motivo = document.getElementById("motivoSalida").value.trim();
-  const destino = document.getElementById("destinoSalida").value.trim();
+    function formatDateForFilter(d) {
+      if (!d) return '';
+      if (typeof d === 'string') d = parseDate(d);
+      if (!d || isNaN(d)) return '';
+      return d.toLocaleDateString('es-ES', {day:'2-digit', month:'short', year:'numeric'});
+    }
 
-  if (idx === "") {
-    alert("Selecciona un material");
-    return;
-  }
-  if (!cantidad || cantidad <= 0) {
-    alert("Ingresa una cantidad válida");
-    return;
-  }
-  if (!motivo) {
-    alert("Ingresa un motivo para la salida");
-    return;
-  }
+    function toCurrency(n) {
+      if (n === undefined || n === null || isNaN(n)) return '—';
+      return Number(n).toFixed(2);
+    }
 
-  const producto = inventario[parseInt(idx)];
-  if (cantidad > producto.cantidad) {
-    alert(`Stock insuficiente. Solo hay ${producto.cantidad} unidades disponibles.`);
-    return;
-  }
+    function escapeHtml(text) {
+      if (!text) return '';
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
 
-  // Registrar salida
-  const salida = {
-    material: producto.nombre,
-    codigo: producto.codigo,
-    cantidad: cantidad,
-    motivo: motivo,
-    destino: destino || "No especificado",
-    fecha: new Date().toLocaleString(),
-    timestamp: Date.now()
-  };
-  salidas.push(salida);
-  localStorage.setItem("salidasISC", JSON.stringify(salidas));
+    function getUniqueKey(item) {
+      return `${item.articulo}|${item.empresa}|${item.factura}|${item.fecha}|${item.precioUnit}|${item.cantidad}`;
+    }
 
-  // Actualizar inventario
-  producto.cantidad -= cantidad;
-  localStorage.setItem("inventarioISC", JSON.stringify(inventario));
+    async function loadData() {
+      try {
+        const response = await fetch(DATA_URL);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const csv = await response.text();
+        
+        const lines = [];
+        let currentLine = '';
+        let insideQuotes = false;
+        
+        for (let i = 0; i < csv.length; i++) {
+          const char = csv[i];
+          if (char === '"') {
+            insideQuotes = !insideQuotes;
+            currentLine += char;
+          } else if (char === '\n' && !insideQuotes) {
+            if (currentLine.trim()) {
+              lines.push(currentLine);
+            }
+            currentLine = '';
+          } else {
+            currentLine += char;
+          }
+        }
+        if (currentLine.trim()) {
+          lines.push(currentLine);
+        }
+        
+        if (lines.length < 2) {
+          throw new Error('No hay datos suficientes en el CSV');
+        }
+        
+        const headers = parseCSVLine(lines[0]);
+        
+        const idx = {
+          factura: headers.findIndex(h => /factura/i.test(h)),
+          empresa: headers.findIndex(h => /empresa/i.test(h)),
+          fecha: headers.findIndex(h => /fecha/i.test(h)),
+          articulo: headers.findIndex(h => /art[íi]culo|producto|item/i.test(h)),
+          cantidad: headers.findIndex(h => /cantidad/i.test(h)),
+          unidad: headers.findIndex(h => /unidad/i.test(h)),
+          precioUnit: headers.findIndex(h => /precio por unidad|precio unitario|precio.*unidad/i.test(h)),
+          subtotal: headers.findIndex(h => /subtotal/i.test(h)),
+          iva: headers.findIndex(h => /iva|impuesto/i.test(h)),
+          total: headers.findIndex(h => /precio total|total/i.test(h))
+        };
+        
+        const data = [];
+        const seen = new Set();
+        
+        for (let i = 1; i < lines.length; i++) {
+          const cols = parseCSVLine(lines[i]);
+          if (cols.length < 2) continue;
+          
+          const get = (idx) => (idx >= 0 && idx < cols.length) ? cols[idx].trim() : '';
+          
+          const item = {
+            factura: get(idx.factura),
+            empresa: get(idx.empresa),
+            fecha: get(idx.fecha),
+            articulo: get(idx.articulo),
+            cantidad: parseFloat(get(idx.cantidad)) || 0,
+            unidad: get(idx.unidad),
+            precioUnit: parseFloat(get(idx.precioUnit)) || 0,
+            subtotal: parseFloat(get(idx.subtotal)) || 0,
+            iva: parseFloat(get(idx.iva)) || 0,
+            total: parseFloat(get(idx.total)) || 0,
+          };
+          
+          if (item.articulo && item.articulo.trim() !== '') {
+            const key = getUniqueKey(item);
+            if (!seen.has(key)) {
+              seen.add(key);
+              data.push(item);
+            }
+          }
+        }
+        
+        return data;
+      } catch (error) {
+        console.error('Error loading data:', error);
+        throw error;
+      }
+    }
 
-  // Limpiar y actualizar
-  limpiarSalida();
-  cargarDatos();
-  document.getElementById("salidaIndicator").innerHTML = `✅ Salida registrada: ${cantidad} unidades de ${producto.nombre}`;
-  setTimeout(() => {
-    document.getElementById("salidaIndicator").innerHTML = '';
-  }, 3000);
-}
+    function parseCSVLine(line) {
+      const result = [];
+      let current = '';
+      let insideQuotes = false;
+      
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        if (char === '"') {
+          insideQuotes = !insideQuotes;
+        } else if (char === ',' && !insideQuotes) {
+          result.push(current);
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+      result.push(current);
+      return result;
+    }
 
-function mostrarSalidas() {
-  const tbody = document.getElementById("tablaSalidas");
-  tbody.innerHTML = "";
-  // Mostrar más recientes primero
-  const salidasOrdenadas = [...salidas].reverse();
-  salidasOrdenadas.forEach((s, idx) => {
-    const idxReal = salidas.length - 1 - idx;
-    tbody.innerHTML += `
-    <tr>
-      <td><strong>${s.material}</strong><br><span style="font-size:0.7rem; color:#3d6e52;">${s.codigo}</span></td>
-      <td><span style="font-weight:600; color:#c0392b;">-${s.cantidad}</span></td>
-      <td>${s.motivo}</td>
-      <td>${s.destino}</td>
-      <td style="font-size:0.75rem;">${s.fecha}</td>
-      <td>
-        <button class="btn-icon btn-delete" onclick="eliminarSalida(${idxReal})">✕</button>
-      </td>
-    </tr>`;
-  });
-  document.getElementById("salidasCount").textContent = `Total: ${salidas.length} salidas`;
-}
+    function populateFilters() {
+      const proveedores = new Set();
+      const fechas = new Set();
+      
+      allData.forEach(item => {
+        if (item.empresa) proveedores.add(item.empresa);
+        if (item.fecha) {
+          const formatted = formatDateForFilter(item.fecha);
+          if (formatted) fechas.add(formatted);
+        }
+      });
 
-function eliminarSalida(index) {
-  if (confirm("¿Eliminar esta salida? Esto no revertirá el stock automáticamente.")) {
-    salidas.splice(index, 1);
-    localStorage.setItem("salidasISC", JSON.stringify(salidas));
-    mostrarSalidas();
-  }
-}
+      filterProveedor.innerHTML = '<option value="">Todos los proveedores</option>';
+      [...proveedores].sort().forEach(prov => {
+        const option = document.createElement('option');
+        option.value = prov;
+        option.textContent = prov;
+        filterProveedor.appendChild(option);
+      });
 
-function limpiarSalida() {
-  document.getElementById("selectMaterialSalida").value = "";
-  document.getElementById("cantidadSalida").value = "";
-  document.getElementById("motivoSalida").value = "";
-  document.getElementById("destinoSalida").value = "";
-  document.getElementById("stockDisponible").textContent = "0";
-  document.getElementById("salidaIndicator").innerHTML = '';
-}
+      filterFecha.innerHTML = '<option value="">Todas las fechas</option>';
+      [...fechas].sort((a, b) => {
+        const da = parseDate(a);
+        const db = parseDate(b);
+        if (da && db) return db - da;
+        return 0;
+      }).forEach(fecha => {
+        const option = document.createElement('option');
+        option.value = fecha;
+        option.textContent = fecha;
+        filterFecha.appendChild(option);
+      });
+    }
 
-// ============================
-//  DASHBOARD (KPIs + gráficos)
-// ============================
-function actualizarDashboards() {
-  const total = inventario.length;
-  let unidades = 0, valor = 0, bajo = 0;
-  inventario.forEach(p => {
-    unidades += p.cantidad;
-    valor += p.cantidad * p.precio;
-    if (p.cantidad < 10) bajo++;
-  });
-  document.getElementById("dashTotal").textContent = total;
-  document.getElementById("dashUnidades").textContent = unidades;
-  document.getElementById("dashValor").textContent = "$" + valor.toFixed(2);
-  document.getElementById("dashBajo").textContent = bajo;
-  document.getElementById("dashResumen").textContent = `📌 ${total} productos · ${unidades} unidades · valor total $${valor.toFixed(2)} · ${bajo} alertas de stock bajo. Salidas registradas: ${salidas.length}`;
-}
+    function renderCards(data) {
+      cardsGrid.innerHTML = '';
+      if (!data || data.length === 0) {
+        cardsGrid.style.display = 'none';
+        noResults.style.display = 'block';
+        return;
+      }
+      noResults.style.display = 'none';
+      cardsGrid.style.display = 'grid';
+      data.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.className = 'card fade-in';
+        card.dataset.index = index;
+        card.innerHTML = `
+          <div class="article">${escapeHtml(item.articulo)}</div>
+          <div class="price-unit">${toCurrency(item.precioUnit)} ${item.unidad ? '/ '+escapeHtml(item.unidad) : ''}</div>
+          <div class="detail-row"><span><i class="fas fa-building"></i> Empresa</span><span>${escapeHtml(item.empresa)}</span></div>
+          <div class="detail-row"><span><i class="fas fa-calendar"></i> Fecha</span><span>${formatDate(item.fecha)}</span></div>
+          <div class="detail-row"><span><i class="fas fa-hashtag"></i> Cantidad</span><span>${item.cantidad} ${escapeHtml(item.unidad)}</span></div>
+          <div class="detail-row"><span><i class="fas fa-file-invoice"></i> Factura</span><span>${escapeHtml(item.factura)}</span></div>
+          <div class="detail-row"><span><i class="fas fa-receipt"></i> Subtotal</span><span>${toCurrency(item.subtotal)}</span></div>
+          <div class="detail-row"><span><i class="fas fa-percent"></i> IVA</span><span>${toCurrency(item.iva)}</span></div>
+          <div class="detail-row"><span><i class="fas fa-coins"></i> Total</span><span>${toCurrency(item.total)}</span></div>
+          <div class="card-actions">
+            <button class="view-analysis" data-index="${index}"><i class="fas fa-chart-simple"></i> Análisis</button>
+          </div>
+        `;
+        cardsGrid.appendChild(card);
+      });
 
-function actualizarGraficos() {
-  const categorias = [...new Set(inventario.map(p => p.categoria))];
-  const counts = categorias.map(cat => inventario.filter(p => p.categoria === cat).reduce((a, p) => a + p.cantidad, 0));
-  const valores = categorias.map(cat => inventario.filter(p => p.categoria === cat).reduce((a, p) => a + (p.cantidad * p.precio), 0));
+      document.querySelectorAll('.view-analysis').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          const idx = parseInt(this.dataset.index);
+          if (!isNaN(idx) && idx < filteredData.length) {
+            showAnalysis(idx);
+          }
+        });
+      });
+    }
 
-  const ctx1 = document.getElementById('chartCategorias').getContext('2d');
-  const ctx2 = document.getElementById('chartValorCategoria').getContext('2d');
+    function showAnalysis(index) {
+      const item = filteredData[index];
+      if (!item) return;
+      currentCardIndex = index;
+      const articulo = item.articulo;
+      const allSame = filteredData.filter(d => d.articulo.toLowerCase() === articulo.toLowerCase());
+      if (allSame.length === 0) return;
 
-  if (chartCategoria) chartCategoria.destroy();
-  if (chartValorCategoria) chartValorCategoria.destroy();
+      analysisArticleName.textContent = articulo;
+      const prices = allSame.map(d => d.precioUnit).filter(p => p > 0);
+      const min = Math.min(...prices);
+      const max = Math.max(...prices);
+      const avg = prices.reduce((a,b) => a+b, 0) / prices.length;
+      const last = allSame[allSame.length-1];
 
-  const colores = ['#1f7a4d','#3da06a','#7ab893','#b3d9c4','#4b8c6b','#267a53'];
-  chartCategoria = new Chart(ctx1, {
-    type: 'bar',
-    data: { labels: categorias.length ? categorias : ['Sin datos'], datasets: [{ label: 'Unidades', data: categorias.length ? counts : [0], backgroundColor: colores, borderRadius: 8 }] },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: '#e2ede6' } }, x: { grid: { display: false } } } }
-  });
+      analysisGrid.innerHTML = `
+        <div class="analysis-item"><span class="label">Precio más bajo</span><span class="value">${toCurrency(min)}</span></div>
+        <div class="analysis-item"><span class="label">Precio más alto</span><span class="value">${toCurrency(max)}</span></div>
+        <div class="analysis-item"><span class="label">Precio promedio</span><span class="value">${toCurrency(avg)}</span></div>
+        <div class="analysis-item"><span class="label">Último precio</span><span class="value">${toCurrency(last.precioUnit)}</span></div>
+        <div class="analysis-item"><span class="label">Última compra</span><span class="value">${formatDate(last.fecha)}</span></div>
+        <div class="analysis-item"><span class="label">Veces comprado</span><span class="value">${allSame.length}</span></div>
+      `;
 
-  chartValorCategoria = new Chart(ctx2, {
-    type: 'bar',
-    data: { labels: categorias.length ? categorias : ['Sin datos'], datasets: [{ label: 'Valor ($)', data: categorias.length ? valores : [0], backgroundColor: ['#1a5f7a','#2f7f9e','#5b9fb8','#8bbfd4','#3f7a8a','#1e5a6b'], borderRadius: 8 }] },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: '#e2ede6' } }, x: { grid: { display: false } } } }
-  });
-}
+      historyTimeline.innerHTML = '';
+      const sorted = [...allSame].sort((a,b) => {
+        const da = parseDate(a.fecha) || new Date(0);
+        const db = parseDate(b.fecha) || new Date(0);
+        return db - da;
+      });
+      sorted.forEach(h => {
+        const div = document.createElement('div');
+        div.className = 'history-item';
+        div.innerHTML = `<span class="date">${formatDate(h.fecha)}</span> <span>${escapeHtml(h.empresa)}</span> <span>${toCurrency(h.precioUnit)} ${escapeHtml(h.unidad)}</span> <span>Fact. ${escapeHtml(h.factura)}</span> <span>Cant. ${h.cantidad}</span>`;
+        historyTimeline.appendChild(div);
+      });
 
-// ============================
-//  PROVEEDORES (pantalla 3)
-// ============================
-function renderProveedores() {
-  const container = document.getElementById('listaProveedores');
-  container.innerHTML = '';
-  proveedores.forEach((p, i) => {
-    container.innerHTML += `
-    <div class="list-item">
-      <span><strong>${p.nombre}</strong> <span style="font-size:0.7rem; color:#3d6e52;">(compras: ${p.compras})</span></span>
-      <span style="font-size:0.7rem; color:#2b6b47;">último: ${p.ultimo}</span>
-    </div>`;
-  });
-  // últimas compras simuladas
-  const comprasContainer = document.getElementById('ultimasCompras');
-  const items = [
-    { prod: 'Tornillos M8', cant: 120, total: 240 },
-    { prod: 'Cable 2.5mm', cant: 80, total: 400 },
-    { prod: 'Pintura blanca', cant: 15, total: 225 },
-  ];
-  comprasContainer.innerHTML = '';
-  let totalGastado = 0;
-  items.forEach(item => {
-    totalGastado += item.total;
-    comprasContainer.innerHTML += `
-    <div class="list-item">
-      <span>${item.prod} <span style="color:#3d6e52;">x${item.cant}</span></span>
-      <span>$${item.total.toFixed(2)}</span>
-    </div>`;
-  });
-  document.getElementById('totalGastado').textContent = '$' + totalGastado.toFixed(2);
-}
+      analysisPanel.style.display = 'block';
+      analysisPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
 
-function agregarProveedor() {
-  const input = document.getElementById('nuevoProveedor');
-  const nombre = input.value.trim();
-  if (!nombre) return alert('Ingresa un nombre');
-  proveedores.push({ nombre, compras: 0, ultimo: new Date().toISOString().slice(0,10) });
-  input.value = '';
-  renderProveedores();
-}
+    function applyFiltersAndSort() {
+      const search = searchInput.value.toLowerCase().trim();
+      const proveedor = filterProveedor.value;
+      const fecha = filterFecha.value;
 
-// ============================
-//  INIT
-// ============================
-document.addEventListener('DOMContentLoaded', () => {
-  cargarDatos();
-});
+      let filtered = allData.filter(item => {
+        if (search && !item.articulo.toLowerCase().includes(search)) return false;
+        if (proveedor && item.empresa !== proveedor) return false;
+        if (fecha) {
+          const itemFecha = formatDateForFilter(item.fecha);
+          if (itemFecha !== fecha) return false;
+        }
+        return true;
+      });
+
+      const sortVal = sortSelect.value;
+      if (sortVal === 'precioBajo') filtered.sort((a,b) => a.precioUnit - b.precioUnit);
+      else if (sortVal === 'precioAlto') filtered.sort((a,b) => b.precioUnit - a.precioUnit);
+      else if (sortVal === 'alfabetico') filtered.sort((a,b) => a.articulo.localeCompare(b.articulo));
+      else if (sortVal === 'antiguo') filtered.sort((a,b) => (parseDate(a.fecha) || new Date(0)) - (parseDate(b.fecha) || new Date(0)));
+      else {
+        filtered.sort((a,b) => (parseDate(b.fecha) || new Date(0)) - (parseDate(a.fecha) || new Date(0)));
+      }
+
+      filteredData = filtered;
+      renderCards(filtered);
+      updateStats();
+
+      if (analysisPanel.style.display === 'block') {
+        if (currentCardIndex >= filteredData.length) {
+          analysisPanel.style.display = 'none';
+        } else {
+          const currentArticle = analysisArticleName.textContent;
+          const idx = filteredData.findIndex(d => d.articulo === currentArticle);
+          if (idx >= 0) showAnalysis(idx);
+          else analysisPanel.style.display = 'none';
+        }
+      }
+    }
+
+    function updateStats() {
+      const uniqueArt = new Set(allData.map(d => d.articulo));
+      const uniqueFact = new Set(allData.map(d => d.factura));
+      const uniqueEmp = new Set(allData.map(d => d.empresa));
+      totalArticulos.textContent = uniqueArt.size;
+      totalFacturas.textContent = uniqueFact.size;
+      totalProveedores.textContent = uniqueEmp.size;
+      const now = new Date();
+      ultimaActualizacion.textContent = now.toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+    }
+
+    async function init() {
+      loader.style.display = 'flex';
+      cardsGrid.style.display = 'none';
+      noResults.style.display = 'none';
+      analysisPanel.style.display = 'none';
+
+      try {
+        const data = await loadData();
+        allData = data;
+        filteredData = [...allData];
+        loader.style.display = 'none';
+        
+        if (allData.length === 0) {
+          noResults.style.display = 'block';
+          noResults.innerHTML = '<i class="fas fa-exclamation-triangle" style="font-size:2rem; display:block;"></i> No se encontraron datos. Verifica que la hoja tenga datos y esté publicada.';
+        } else {
+          populateFilters();
+          renderCards(allData);
+          updateStats();
+        }
+      } catch (error) {
+        loader.style.display = 'none';
+        noResults.style.display = 'block';
+        noResults.innerHTML = `<i class="fas fa-exclamation-circle" style="font-size:2rem; display:block;"></i> Error al cargar datos:<br><small>${error.message}</small><br><br>Verifica que la hoja esté publicada.`;
+        console.error('Init error:', error);
+      }
+
+      searchInput.addEventListener('input', applyFiltersAndSort);
+      filterProveedor.addEventListener('change', applyFiltersAndSort);
+      filterFecha.addEventListener('change', applyFiltersAndSort);
+      sortSelect.addEventListener('change', applyFiltersAndSort);
+
+      clearBtn.addEventListener('click', function() {
+        searchInput.value = '';
+        filterProveedor.value = '';
+        filterFecha.value = '';
+        sortSelect.value = 'reciente';
+        applyFiltersAndSort();
+      });
+
+      themeToggle.addEventListener('click', function() {
+        document.body.classList.toggle('dark');
+        const isDark = document.body.classList.contains('dark');
+        themeLabel.textContent = isDark ? 'Modo claro' : 'Modo oscuro';
+        themeToggle.innerHTML = `<i class="fas ${isDark ? 'fa-sun' : 'fa-moon'}"></i> ${isDark ? 'Claro' : 'Oscuro'}`;
+      });
+
+      backToTop.addEventListener('click', function() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+
+      document.getElementById('printCardBtn').addEventListener('click', function() {
+        window.print();
+      });
+      document.getElementById('exportPdfBtn').addEventListener('click', function() {
+        alert('Para exportar a PDF, usa "Imprimir" y selecciona "Guardar como PDF" en el diálogo de impresión.');
+      });
+    }
+
+    init();
+  })();
 </script>
-
 </body>
 </html>
