@@ -761,7 +761,8 @@
             empresa: get(idx.empresa),
             fecha: get(idx.fecha),
             articulo: get(idx.articulo),
-            cantidad: parseFloat(get(idx.cantidad)) || 0,
+            cantidad: get(idx.cantidad),
+            cantidadNumerica: parseFloat(get(idx.cantidad)) || 0,
             unidad: get(idx.unidad),
             precioUnit: parseFloat(get(idx.precioUnit)) || 0,
             subtotal: parseFloat(get(idx.subtotal)) || 0,
@@ -857,7 +858,15 @@
           <div class="price-unit">${toCurrency(item.precioUnit)} ${item.unidad ? '/ '+escapeHtml(item.unidad) : ''}</div>
           <div class="detail-row"><span><i class="fas fa-building"></i> Empresa</span><span>${escapeHtml(item.empresa)}</span></div>
           <div class="detail-row"><span><i class="fas fa-calendar"></i> Fecha</span><span>${formatDate(item.fecha)}</span></div>
-          <div class="detail-row"><span><i class="fas fa-hashtag"></i> Cantidad</span><span>${item.cantidad} ${escapeHtml(item.unidad)}</span></div>
+          <div class="detail-row">
+    <span><i class="fas fa-hashtag"></i> Cantidad</span>
+    <span>${escapeHtml(item.cantidad)}</span>
+</div>
+
+<div class="detail-row">
+    <span><i class="fas fa-ruler"></i> Unidad de medida</span>
+    <span>${escapeHtml(item.unidad)}</span>
+</div>
           <div class="detail-row"><span><i class="fas fa-file-invoice"></i> Factura</span><span>${escapeHtml(item.factura)}</span></div>
           <div class="detail-row"><span><i class="fas fa-receipt"></i> Subtotal</span><span>${toCurrency(item.subtotal)}</span></div>
           <div class="detail-row"><span><i class="fas fa-percent"></i> IVA</span><span>${toCurrency(item.iva)}</span></div>
