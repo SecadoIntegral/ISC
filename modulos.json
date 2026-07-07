@@ -1,0 +1,10 @@
+[
+    {
+        "nombre":"Consulta de Precios",
+        "archivo":"precios.html",
+        "icono":"fa-tags",
+        "descripcion":"Consulta histórica de precios.",
+        "color":"#1976d2"
+    }
+]
+
