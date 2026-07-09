@@ -1,303 +1,116 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 
 <head>
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task List</title>
 
-    <title>Cuaderno de Compras | Industrias San Carlos</title>
-
-    <!-- Fuente principal -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Patrick+Hand&display=swap" rel="stylesheet">
-
-    <!-- Estilos -->
     <link rel="stylesheet" href="compras.css">
 
 </head>
 
-<body>
 
-    <a href="index.html" class="backButton">
+<body>
+<a href="index.html" class="backButton">
     ← Inicio
 </a>
-    <!-- ===========================
-            MESA
-    ============================ -->
 
-    <main class="desk">
+<div id="loginBox" class="login-overlay">
 
-        <!-- ===========================
-                CUADERNO
-        ============================ -->
+    <div class="login-card">
 
-        <section class="notebook">
+        <h2>Acceso</h2>
 
-            <!-- Espiral -->
+        <input 
+            id="passwordInput"
+            type="password"
+            placeholder="Contraseña"
+        >
 
-            <div class="spiral"></div>
-
-            <!-- Clip -->
-
-            <div class="clip"></div>
-
-            <!-- ===========================
-                    PESTAÑAS
-            ============================ -->
-
-            <aside class="tabs">
-
-                <button
-                    class="tab alta active"
-                    data-priority="Alta">
-
-                    📕 Alta
-
-                    <span id="countAlta">0</span>
-
-                </button>
-
-                <button
-                    class="tab media"
-                    data-priority="Media">
-
-                    📘 Media
-
-                    <span id="countMedia">0</span>
-
-                </button>
-
-                <button
-                    class="tab baja"
-                    data-priority="Baja">
-
-                    📗 Baja
-
-                    <span id="countBaja">0</span>
-
-                </button>
-
-            </aside>
-
-            <!-- ===========================
-                    CABECERA
-            ============================ -->
-
-            <header class="header">
-
-                <div class="empresa">
-
-                    INDUSTRIAS SAN CARLOS
-
-                </div>
-
-                <h1>
-
-                    Cuaderno de Compras
-
-                </h1>
-
-                <p>
-
-                    Materiales solicitados por las distintas áreas.
-
-                </p>
-
-            </header>
-
-            <!-- ===========================
-                    HOJA
-            ============================ -->
-
-            <section class="page">
-
-                <!-- Línea roja -->
-
-                <div class="margin-line"></div>
-
-                <!-- Lista -->
-
-                <div
-                    id="lista"
-                    class="list">
-
-                    <!-- JavaScript genera el contenido -->
-
-                </div>
-
-            </section>
-
-            <!-- ===========================
-                    PIE
-            ============================ -->
-
-            <footer class="footer">
-
-                <span id="pageTitle">
-
-                    Prioridad Alta
-
-                </span>
-
-            </footer>
-
-        </section>
-
-    </main>
-
-    <!-- ===========================
-            PLANTILLA
-    ============================ -->
-
-    <template id="itemTemplate">
-
-        <article class="purchase-item">
-
-            <div class="line-number">
-
-            </div>
-
-            <div class="item-content">
-
-                <div class="item-header">
-
-                    <div class="item-icon">
-
-                    </div>
-
-                    <div class="item-name">
-
-                    </div>
-
-                </div>
-
-                <div class="item-info">
-
-                    <div>
-
-                        <span class="label">
-
-                            Cantidad
-
-                        </span>
-
-                        <span class="cantidad">
-
-                        </span>
-
-                    </div>
-
-                    <div>
-
-                        <span class="label">
-
-                            Unidad
-
-                        </span>
-
-                        <span class="unidad">
-
-                        </span>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-            <div class="estado">
-
-            </div>
-
-        </article>
-
-    </template>
-
-    <!-- ===========================
-            MENSAJE SIN DATOS
-    ============================ -->
-
-    <template id="emptyTemplate">
-
-        <div class="empty-page">
-
-            <div class="empty-icon">
-
-                📄
-
-            </div>
-
-            <h2>
-
-                No hay artículos
-
-            </h2>
-
-            <p>
-
-                Esta prioridad no tiene materiales pendientes.
-
-            </p>
-
-        </div>
-
-    </template>
-
-    <!-- ===========================
-            LOADER
-    ============================ -->
-
-    <div
-        id="loader"
-        class="loader">
-
-        <div class="loader-paper">
-
-            📖
-
-        </div>
-
-        <p>
-
-            Cargando lista de compras...
-
-        </p>
-
-    </div>
-
-    <!-- ===========================
-            ERROR
-    ============================ -->
-
-    <div
-        id="error"
-        class="error hidden">
-
-        <h2>
-
-            No fue posible cargar la lista.
-
-        </h2>
-
-        <p>
-
-            Verifique la conexión con Google Sheets.
-
-        </p>
-
-        <button id="reload">
-
-            Reintentar
-
+        <button id="btnAdmin">
+            Entrar
         </button>
 
+
+        <button id="btnInvitado">
+            Entrar como invitado
+        </button>
+
+        <p id="loginError"></p>
+
     </div>
 
-    <!-- ===========================
-            JAVASCRIPT
-    ============================ -->
+</div>
 
-    <script src="compras.js"></script>
+<div class="desk">
+
+
+    <div class="notebook">
+
+
+        <div class="spiral"></div>
+
+
+        <header class="header">
+
+            <div class="empresa">
+                INDUSTRIAS SAN CARLOS
+            </div>
+
+            <h1>
+                Lista de tareas
+            </h1>
+
+            <p>
+                Organización diaria
+            </p>
+
+        </header>
+
+
+
+        <main class="page">
+
+
+            <div class="margin-line"></div>
+
+
+            <div class="task-form">
+
+                <input 
+                    id="nuevaTarea"
+                    type="text"
+                    placeholder="Escribe una nueva tarea..."
+                >
+
+
+                <button id="btnAgregar">
+                    Agregar
+                </button>
+
+
+            </div>
+
+
+
+            <ul id="listaTareas"></ul>
+
+
+
+        </main>
+
+
+    </div>
+
+
+</div>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="compras.js"></script>
+
 
 </body>
 

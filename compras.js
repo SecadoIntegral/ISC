@@ -1,107 +1,81 @@
-/******************************************************
-        CUADERNO DE COMPRAS
-        INDUSTRIAS SAN CARLOS
-******************************************************/
+const SUPABASE_URL = "https://fbdletfjoeaoepsbeobc.supabase.co";
+
+const SUPABASE_KEY = "sb_publishable_3zWVTfsCkOGdHdSoRgobCg_HDHhmaWk";
 
 
-/******************************************************
-        CONFIGURACIÓN GOOGLE SHEETS
-******************************************************/
-
-
-const URL_COMPRAS = 
-"https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7YBui32JBbGTNLfR4FIRHWvu9xP-GJFaEisdpvOvAxVJLv0AVw6-9pOMAb44UVA/pub?gid=606362613&single=true&output=csv";
+const clienteSupabase = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
 
 
 
-/******************************************************
-        VARIABLES
-******************************************************/
+// ======================================
+// CONTROL DE ACCESO
+// ======================================
 
 
-let compras = [];
-
-let prioridadActual = "Alta";
+const PASSWORD_ADMIN = "1234";
 
 
-
-const lista = document.getElementById("lista");
-
-const tabs = document.querySelectorAll(".tab");
-
-const pageTitle = document.getElementById("pageTitle");
-
-
-const countAlta = document.getElementById("countAlta");
-
-const countMedia = document.getElementById("countMedia");
-
-const countBaja = document.getElementById("countBaja");
-
-
-const template = document.getElementById("itemTemplate");
-
-const emptyTemplate = document.getElementById("emptyTemplate");
+let modoAdmin = false;
 
 
 
-const loader = document.getElementById("loader");
+function entrarInvitado(){
 
-const errorBox = document.getElementById("error");
-
-const reloadBtn = document.getElementById("reload");
+    modoAdmin = false;
 
 
-
-/******************************************************
-        CARGAR DATOS
-******************************************************/
-
-
-async function cargarCompras(){
+    document
+    .getElementById("loginBox")
+    .style.display = "none";
 
 
-    try{
+    document
+    .getElementById("btnAgregar")
+    .style.display = "none";
 
+    document
+.getElementById("nuevaTarea")
+.style.display = "none";
 
-        mostrarLoader(true);
+    cargarTareas();
 
-
-        const respuesta = await fetch(URL_COMPRAS);
-
-
-        const texto = await respuesta.text();
+}
 
 
 
-        compras = convertirCSV(texto);
+
+function entrarAdmin(){
+
+
+    const password =
+    document.getElementById("passwordInput").value;
 
 
 
-        actualizarContadores();
+    if(password === PASSWORD_ADMIN){
+
+
+        modoAdmin = true;
+
+
+        document
+        .getElementById("loginBox")
+        .style.display = "none";
+
+
+        cargarTareas();
 
 
 
-        mostrarLista();
+    }else{
 
 
-
-        mostrarLoader(false);
-
-
-
-    }
-
-    catch(error){
-
-
-        console.error(error);
-
-
-        mostrarLoader(false);
-
-
-        errorBox.classList.remove("hidden");
+        document
+        .getElementById("loginError")
+        .textContent = "Contraseña incorrecta";
 
 
     }
@@ -111,51 +85,151 @@ async function cargarCompras(){
 
 
 
-/******************************************************
-        CONVERTIR CSV
-******************************************************/
-
-
-function convertirCSV(csv){
-
-
-
-    const filas = csv
-    .trim()
-    .split("\n");
+document
+.getElementById("btnAdmin")
+.addEventListener(
+    "click",
+    entrarAdmin
+);
 
 
 
-    const encabezados = separarCSV(filas[0]);
+document
+.getElementById("btnInvitado")
+.addEventListener(
+    "click",
+    entrarInvitado
+);
 
 
 
-    return filas
-    .slice(1)
-    .map(fila=>{
 
 
-        const datos = separarCSV(fila);
+// ======================================
+// CARGAR TAREAS DESDE SUPABASE
+// ======================================
 
 
-
-        let objeto = {};
-
+async function cargarTareas(){
 
 
-        encabezados.forEach((columna,index)=>{
-
-
-            objeto[columna.trim()] = 
-            datos[index]?.trim() || "";
+    const { data, error } = await clienteSupabase
+        .from("tareas")
+        .select("*");
 
 
 
-        });
+    if(error){
+
+        console.log(error);
+        return;
+
+    }
 
 
 
-        return objeto;
+    const lista = document.getElementById("listaTareas");
+
+
+    lista.innerHTML = "";
+
+
+
+    data.forEach(tarea => {
+
+
+
+        const elemento = document.createElement("li");
+
+
+
+        // CHECKBOX
+
+        const checkbox = document.createElement("input");
+
+
+        checkbox.type = "checkbox";
+
+
+        checkbox.checked = tarea.completada;
+
+
+
+        checkbox.addEventListener(
+            "change",
+            () => cambiarEstado(tarea)
+        );
+
+
+
+
+        // BOTON EDITAR
+
+        const botonEditar = document.createElement("button");
+
+
+        botonEditar.textContent = "Editar";
+
+
+
+        botonEditar.addEventListener(
+            "click",
+            () => editarTarea(tarea)
+        );
+
+
+
+
+        // BOTON ELIMINAR
+
+        const botonEliminar = document.createElement("button");
+
+
+        botonEliminar.textContent = "Eliminar";
+
+
+
+        botonEliminar.addEventListener(
+            "click",
+            () => eliminarTarea(tarea)
+        );
+
+
+
+
+
+        // AGREGAR ELEMENTOS
+
+
+        elemento.appendChild(checkbox);
+
+
+
+        elemento.appendChild(
+            document.createTextNode(
+                tarea.tarea
+            )
+        );
+
+
+
+
+        // SOLO ADMIN VE ESTOS BOTONES
+
+        if(modoAdmin){
+
+
+            elemento.appendChild(botonEditar);
+
+
+            elemento.appendChild(botonEliminar);
+
+
+        }
+
+
+
+        lista.appendChild(elemento);
 
 
 
@@ -167,197 +241,121 @@ function convertirCSV(csv){
 
 
 
-/******************************************************
-        SEPARADOR CSV
-******************************************************/
 
 
-function separarCSV(linea){
+// ======================================
+// AGREGAR NUEVA TAREA
+// ======================================
 
 
+async function agregarTarea(){
 
-    let resultado=[];
 
-    let actual="";
+    const input =
+    document.getElementById("nuevaTarea");
 
-    let comillas=false;
 
+    const texto = input.value;
 
 
-    for(let i=0;i<linea.length;i++){
 
-
-        let letra=linea[i];
-
-
-
-        if(letra === '"'){
-
-
-            comillas=!comillas;
-
-
-        }
-
-
-        else if(letra === "," && !comillas){
-
-
-            resultado.push(actual);
-
-            actual="";
-
-
-        }
-
-
-        else{
-
-
-            actual+=letra;
-
-
-        }
-
-
-    }
-
-
-
-    resultado.push(actual);
-
-
-
-    return resultado;
-
-
-}
-
-
-
-
-
-/******************************************************
-        MOSTRAR LISTA
-******************************************************/
-
-
-function mostrarLista(){
-
-
-
-    lista.innerHTML="";
-
-
-
-    const filtrados = compras.filter(item=>{
-
-
-        return normalizar(item.Prioridad)
-        ===
-        normalizar(prioridadActual);
-
-
-
-    });
-
-
-
-    if(filtrados.length===0){
-
-
-        mostrarVacio();
-
+    if(texto.trim() === ""){
 
         return;
 
+    }
+
+
+
+    const { error } = await clienteSupabase
+        .from("tareas")
+        .insert([
+            {
+                tarea:texto,
+                completada:false
+            }
+        ]);
+
+
+
+    if(error){
+
+        console.log(error);
+        return;
 
     }
 
 
 
+    input.value = "";
 
 
-    filtrados.forEach((item,index)=>{
-
-
-        crearArticulo(item,index+1);
-
-
-    });
-
-
-
-    pageTitle.textContent =
-    "Prioridad " + prioridadActual;
-
+    cargarTareas();
 
 
 }
 
 
 
-
-
-/******************************************************
-        CREAR ARTICULO
-******************************************************/
-
-
-function crearArticulo(item,numero){
-
-
-
-    const copia = template.content.cloneNode(true);
+document
+.getElementById("btnAgregar")
+.addEventListener(
+    "click",
+    agregarTarea
+);
 
 
 
-    copia.querySelector(".line-number")
-    .textContent = numero;
+
+
+// ======================================
+// EDITAR TAREA
+// ======================================
+
+
+async function editarTarea(tarea){
 
 
 
-    copia.querySelector(".item-icon")
-    .textContent =
-    obtenerIcono(item.Articulo);
-
-
-
-    copia.querySelector(".item-name")
-    .textContent =
-    item.Articulo;
-
-
-
-    copia.querySelector(".cantidad")
-    .textContent =
-    item.Cantidad;
-
-
-
-    copia.querySelector(".unidad")
-    .textContent =
-    item.Unidad;
-
-
-
-    const estado =
-    copia.querySelector(".estado");
-
-
-
-    estado.textContent =
-    item.Estado;
-
-
-
-    estado.classList.add(
-        claseEstado(item.Estado)
+    const nuevoTexto = prompt(
+        "Editar tarea:",
+        tarea.tarea
     );
 
 
 
-    lista.appendChild(copia);
+    if(nuevoTexto === null){
+
+        return;
+
+    }
+
+
+
+    const { error } = await clienteSupabase
+        .from("tareas")
+        .update({
+
+            tarea:nuevoTexto
+
+        })
+        .eq(
+            "id",
+            tarea.id
+        );
+
+
+
+    if(error){
+
+        console.log(error);
+        return;
+
+    }
+
+
+
+    cargarTareas();
 
 
 
@@ -367,79 +365,40 @@ function crearArticulo(item,numero){
 
 
 
-/******************************************************
-        ICONOS AUTOMÁTICOS
-******************************************************/
+// ======================================
+// CAMBIAR ESTADO
+// ======================================
 
 
-function obtenerIcono(nombre){
-
-
-    nombre =
-    nombre.toLowerCase();
+async function cambiarEstado(tarea){
 
 
 
-    if(nombre.includes("tornillo") ||
-       nombre.includes("tuerca") ||
-       nombre.includes("perno")){
+    const { error } = await clienteSupabase
+        .from("tareas")
+        .update({
+
+            completada: !tarea.completada
+
+        })
+        .eq(
+            "id",
+            tarea.id
+        );
 
 
-        return "🔩";
 
+    if(error){
 
-    }
-
-
-
-    if(nombre.includes("rodamiento") ||
-       nombre.includes("motor") ||
-       nombre.includes("engranaje")){
-
-
-        return "⚙️";
-
+        console.log(error);
+        return;
 
     }
 
 
 
-    if(nombre.includes("pintura") ||
-       nombre.includes("aceite") ||
-       nombre.includes("grasa")){
+    cargarTareas();
 
-
-        return "🛢️";
-
-
-    }
-
-
-
-    if(nombre.includes("cable") ||
-       nombre.includes("eléctrico")){
-
-
-        return "🔌";
-
-
-    }
-
-
-
-    if(nombre.includes("tubo") ||
-       nombre.includes("perfil") ||
-       nombre.includes("acero")){
-
-
-        return "🏗️";
-
-
-    }
-
-
-
-    return "📦";
 
 
 }
@@ -448,222 +407,50 @@ function obtenerIcono(nombre){
 
 
 
-/******************************************************
-        ESTADOS
-******************************************************/
+// ======================================
+// ELIMINAR TAREA
+// ======================================
 
 
-function claseEstado(estado){
-
-
-    estado =
-    normalizar(estado);
+async function eliminarTarea(tarea){
 
 
 
-    if(estado.includes("pendiente")){
-
-        return "pendiente";
-
-    }
+    const confirmar = confirm(
+        "¿Deseas eliminar esta tarea?"
+    );
 
 
-    if(estado.includes("proceso")){
 
-        return "proceso";
+    if(!confirmar){
+
+        return;
 
     }
 
 
-    if(estado.includes("recibido")){
 
-        return "recibido";
+    const { error } = await clienteSupabase
+        .from("tareas")
+        .delete()
+        .eq(
+            "id",
+            tarea.id
+        );
+
+
+
+    if(error){
+
+        console.log(error);
+        return;
 
     }
 
 
-    if(estado.includes("cancelado")){
 
-        return "cancelado";
-
-    }
-
-
-    return "";
-
-}
-
-
-
-
-
-/******************************************************
-        CONTADORES
-******************************************************/
-
-
-function actualizarContadores(){
-
-
-
-    countAlta.textContent =
-    compras.filter(x=>
-    normalizar(x.Prioridad)==="alta")
-    .length;
-
-
-
-    countMedia.textContent =
-    compras.filter(x=>
-    normalizar(x.Prioridad)==="media")
-    .length;
-
-
-
-    countBaja.textContent =
-    compras.filter(x=>
-    normalizar(x.Prioridad)==="baja")
-    .length;
-
-
-}
-
-
-
-
-
-/******************************************************
-        CAMBIO DE PESTAÑA
-******************************************************/
-
-
-tabs.forEach(tab=>{
-
-
-    tab.addEventListener("click",()=>{
-
-
-        prioridadActual =
-        tab.dataset.priority;
-
-
-
-        tabs.forEach(t=>
-        t.classList.remove("active"));
-
-
-
-        tab.classList.add("active");
-
-
-
-        mostrarLista();
-
-
-
-    });
-
-
-
-});
-
-
-
-
-
-
-/******************************************************
-        PAGINA VACÍA
-******************************************************/
-
-
-function mostrarVacio(){
-
-
-    const vacio =
-    emptyTemplate.content.cloneNode(true);
-
-
-
-    lista.appendChild(vacio);
+    cargarTareas();
 
 
 
 }
-
-
-
-
-/******************************************************
-        UTILIDADES
-******************************************************/
-
-
-function normalizar(texto){
-
-
-    return texto
-    .toString()
-    .trim()
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g,"");
-
-
-}
-
-
-
-
-
-/******************************************************
-        LOADER
-******************************************************/
-
-
-function mostrarLoader(valor){
-
-
-    if(valor){
-
-        loader.style.display="flex";
-
-    }
-
-    else{
-
-        loader.style.display="none";
-
-    }
-
-
-}
-
-
-
-/******************************************************
-        REINTENTAR
-******************************************************/
-
-
-reloadBtn.addEventListener("click",()=>{
-
-
-    errorBox.classList.add("hidden");
-
-
-    cargarCompras();
-
-
-});
-
-
-
-
-
-/******************************************************
-        INICIO
-******************************************************/
-
-
-cargarCompras();
