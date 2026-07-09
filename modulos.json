@@ -5,6 +5,12 @@
         "icono":"fa-tags",
         "descripcion":"Consulta histórica de precios.",
         "color":"#1976d2"
+    },
+    {
+        "nombre":"Lista de requerimiento",
+        "archivo":"compras.html",
+        "icono":"fa-tags",
+        "descripcion":"Lista semanal de materia prima necesaria.",
+        "color":"#1200d2"
     }
 ]
-
